@@ -13,6 +13,8 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { RootNavigation } from './src/navigation';
+import { NavigationContainer } from '@react-navigation/native';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -28,7 +30,9 @@ function App() {
 function AppContent() {
   return (
     <View style={styles.container}>
-      <Text>Welcome</Text>
+      <NavigationContainer>
+        <RootNavigation />
+      </NavigationContainer>
     </View>
   );
 }
