@@ -1,20 +1,9 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import {
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { RootNavigation } from './src/navigation';
 import { NavigationContainer } from '@react-navigation/native';
+import { Provider } from 'react-redux';
+import { store } from './src/store';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -31,7 +20,9 @@ function AppContent() {
   return (
     <View style={styles.container}>
       <NavigationContainer>
-        <RootNavigation />
+        <Provider store={store}>
+          <RootNavigation />
+        </Provider>
       </NavigationContainer>
     </View>
   );
