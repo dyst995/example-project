@@ -4,9 +4,5 @@ import { MainNavigator } from './MainNavigator';
 export const RootNavigation = () => {
   const authenticated = false;
 
-  if (authenticated) {
-    return <MainNavigator />;
-  }
-
-  return <AuthNavigator />;
+  return authenticated ? <MainNavigator /> : <AuthNavigator />;
 };
