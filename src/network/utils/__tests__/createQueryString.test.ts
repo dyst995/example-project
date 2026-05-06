@@ -1,4 +1,4 @@
-import { createQueryString } from '../utils';
+import { createQueryString } from '../createQueryString';
 
 describe('createQueryString', () => {
   it('serializes values', () => {

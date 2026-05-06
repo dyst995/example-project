@@ -1,15 +1,7 @@
 const mockDispatch = jest.fn();
-const mockGetState = jest.fn();
 
 const mockRequestUse = jest.fn();
 const mockResponseUse = jest.fn();
-
-jest.mock('../../store', () => ({
-  store: {
-    dispatch: mockDispatch,
-    getState: mockGetState,
-  },
-}));
 
 jest.mock('axios', () => ({
   __esModule: true,
@@ -30,8 +22,10 @@ describe('network config interceptors', () => {
   });
 
   it('adds Authorization header when token exists', async () => {
-    mockGetState.mockReturnValue({ auth: { token: 'abc-token' } });
-    require('../config');
+    const { setupApiClient } = require('../config');
+    setupApiClient({
+      getAccessToken: () => 'abc-token',
+    });
 
     const onRequest = mockRequestUse.mock.calls[0][0];
     const cfg = { headers: {} as Record<string, string> };
@@ -40,7 +34,10 @@ describe('network config interceptors', () => {
   });
 
   it('dispatches signOut on 401 response', async () => {
-    require('../config');
+    const { setupApiClient } = require('../config');
+    setupApiClient({
+      onUnauthorized: mockDispatch,
+    });
 
     const onRejected = mockResponseUse.mock.calls[0][1];
     const error = { response: { status: 401 } };

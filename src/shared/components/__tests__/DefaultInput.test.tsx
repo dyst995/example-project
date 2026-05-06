@@ -1,6 +1,6 @@
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react-native';
-import { DefaultInput } from '../DefaultInput';
+import { DefaultInput } from '../Inputs';
 
 describe('DefaultInput', () => {
   it('renders label when provided', () => {

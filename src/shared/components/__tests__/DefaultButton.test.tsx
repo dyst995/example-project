@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react-native';
-import { DefaultButton } from '../DefaultButton';
-import { Pressable, StyleSheet } from 'react-native';
+import { DefaultButton } from '../Buttons';
+import { StyleSheet } from 'react-native';
 
 describe('DefaultButton', () => {
   it('renders titles', () => {

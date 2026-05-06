@@ -1,9 +1,18 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './auth/auth.slice';
+import { signOut } from './auth/auth.slice';
+import { setupApiClient } from '../network/core';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+  },
+});
+
+setupApiClient({
+  getAccessToken: () => store.getState().auth.token,
+  onUnauthorized: () => {
+    store.dispatch(signOut());
   },
 });
 

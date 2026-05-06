@@ -1,6 +1,4 @@
 import axios from 'axios';
-import { store } from '../../store';
-import { signOut } from '../../store/auth/auth.slice';
 
 import type { ApiConfig } from './types';
 
@@ -14,9 +12,26 @@ export const config: ApiConfig = {
 
 export const apiClient = axios.create(config);
 
+type ApiClientRuntimeConfig = {
+  getAccessToken: () => string | null;
+  onUnauthorized: () => void;
+};
+
+let runtimeConfig: ApiClientRuntimeConfig = {
+  getAccessToken: () => null,
+  onUnauthorized: () => {},
+};
+
+export const setupApiClient = (configOverrides: Partial<ApiClientRuntimeConfig>) => {
+  runtimeConfig = {
+    ...runtimeConfig,
+    ...configOverrides,
+  };
+};
+
 apiClient.interceptors.request.use(
   requestConfig => {
-    const token = store.getState().auth.token;
+    const token = runtimeConfig.getAccessToken();
     if (token) {
       requestConfig.headers.Authorization = `Bearer ${token}`;
     }
@@ -30,7 +45,7 @@ apiClient.interceptors.response.use(
   response => response,
   error => {
     if (error.response?.status === 401 || error.response?.status === 403) {
-      store.dispatch(signOut());
+      runtimeConfig.onUnauthorized();
     }
     return Promise.reject(error);
   },
