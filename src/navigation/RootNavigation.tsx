@@ -1,5 +1,4 @@
-import { AuthNavigator } from './AuthNavigator';
-import { MainNavigator } from './MainNavigator';
+import { AuthNavigator, MainNavigator } from './navigators';
 
 export const RootNavigation = () => {
   const authenticated = false;

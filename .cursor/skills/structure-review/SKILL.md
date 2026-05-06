@@ -41,6 +41,12 @@ Validate module internal structure:
 - optional: `modules/<Feature>/types` for view/form-local types
 - optional: `modules/<Feature>/utils` for feature-local helpers
 
+Validate navigation internal structure:
+
+- required folders: `navigation/navigators`, `navigation/types`, `navigation/enums`, `navigation/utils`
+- route param list contracts live in `navigation/types`
+- route/screen name enums live in `navigation/enums`
+
 ## Checklist
 
 - [ ] Functionality used by only one module stays inside that module.
@@ -54,6 +60,10 @@ Validate module internal structure:
 - [ ] Domain models are not mixed with transport DTOs.
 - [ ] Routes/endpoints are not defined in UI/store files.
 - [ ] Network responses are mapped before app-wide use when shapes differ.
+- [ ] Navigation has required folders (`navigators`, `types`, `enums`, `utils`).
+- [ ] Route param list types are centralized under `navigation/types`.
+- [ ] Route/screen enums are centralized under `navigation/enums`.
+- [ ] Navigation files do not contain endpoint, DTO, or service logic.
 - [ ] RTK Query handles server cache; slices are used for client state.
 - [ ] Redux typed hooks stay in `store/hooks.ts`.
 - [ ] Global reusable hooks are in `shared/hooks`; feature hooks stay in feature modules.

@@ -172,6 +172,40 @@ Rules:
 - Keep service methods focused by use case (`login`, `refreshToken`, `logout`).
 - Keep service internals using `BaseService` and core response wrappers for consistency.
 
+## Navigation Structure Standard
+
+Keep app navigation contracts and navigator composition under `src/navigation`.
+
+```txt
+src/navigation/
+  navigators/
+    RootNavigator.tsx
+    AuthorizedNavigator.tsx
+    NonAuthorizedNavigator.tsx
+  types/
+    root.types.ts
+    authorized.types.ts
+    nonauthorized.types.ts
+    index.ts
+  enums/
+    root.enum.ts
+    authorized.enum.ts
+    nonauthorized.enum.ts
+    index.ts
+  utils/
+    constants.ts
+```
+
+Rules:
+
+- `navigation` must contain `navigators`, `types`, `enums`, and `utils` folders.
+- Keep route param list types centralized in `navigation/types`.
+- Keep route/screen name enums centralized in `navigation/enums`.
+- Keep navigation-only helpers/constants in `navigation/utils`.
+- Keep root/app flow composition in `navigation/navigators`.
+- Feature modules own screen implementations; navigators only compose screens.
+- Do not place endpoint, DTO, or service logic in navigation files.
+
 ## State Management (Redux + RTK Query)
 
 Use Redux Toolkit for client state and RTK Query for server state.
