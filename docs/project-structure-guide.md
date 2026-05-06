@@ -179,32 +179,40 @@ Keep app navigation contracts and navigator composition under `src/navigation`.
 ```txt
 src/navigation/
   navigators/
-    RootNavigator.tsx
-    AuthorizedNavigator.tsx
-    NonAuthorizedNavigator.tsx
+    AuthNavigator.tsx
+    MainNavigator.tsx
   types/
-    root.types.ts
-    authorized.types.ts
-    nonauthorized.types.ts
+    auth-navigator-params.type.ts
+    main-navigator-params.type.ts
     index.ts
   enums/
-    root.enum.ts
-    authorized.enum.ts
-    nonauthorized.enum.ts
+    auth-navigator-screens.enum.ts
+    main-navigator-screens.enum.ts
     index.ts
-  utils/
-    constants.ts
+  RootNavigation.tsx
+  index.ts
 ```
 
 Rules:
 
-- `navigation` must contain `navigators`, `types`, `enums`, and `utils` folders.
+- `navigation` must contain `navigators`, `types`, and `enums` folders.
 - Keep route param list types centralized in `navigation/types`.
 - Keep route/screen name enums centralized in `navigation/enums`.
-- Keep navigation-only helpers/constants in `navigation/utils`.
 - Keep root/app flow composition in `navigation/navigators`.
 - Feature modules own screen implementations; navigators only compose screens.
 - Do not place endpoint, DTO, or service logic in navigation files.
+
+Folder responsibilities:
+
+- `navigators/`: navigator components only (screen tree wiring and navigator options).
+- `types/`: route param list contracts only.
+- `enums/`: route/screen name constants only.
+
+Navigator responsibilities:
+
+- `RootNavigation.tsx` must switch between auth flow and main flow only.
+- `AuthNavigator.tsx` must register auth-related screens and use auth param list type.
+- `MainNavigator.tsx` must register authorized/app screens and use main param list type.
 
 ## State Management (Redux + RTK Query)
 

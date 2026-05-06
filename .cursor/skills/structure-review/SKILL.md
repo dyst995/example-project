@@ -43,9 +43,13 @@ Validate module internal structure:
 
 Validate navigation internal structure:
 
-- required folders: `navigation/navigators`, `navigation/types`, `navigation/enums`, `navigation/utils`
-- route param list contracts live in `navigation/types`
-- route/screen name enums live in `navigation/enums`
+- required folders: `navigation/navigators`, `navigation/types`, `navigation/enums`
+- route/screen enums in `navigation/enums` describe screens that each navigator contains
+- route param list contracts in `navigation/types` define params for each screen
+- each navigator must pass its param list type to `create<...>Navigator<ParamList>()` as a generic
+- root switch entry is `navigation/RootNavigation.tsx`
+- auth flow navigator is `navigation/navigators/AuthNavigator.tsx`
+- main flow navigator is `navigation/navigators/MainNavigator.tsx`
 
 ## Checklist
 
@@ -60,9 +64,12 @@ Validate navigation internal structure:
 - [ ] Domain models are not mixed with transport DTOs.
 - [ ] Routes/endpoints are not defined in UI/store files.
 - [ ] Network responses are mapped before app-wide use when shapes differ.
-- [ ] Navigation has required folders (`navigators`, `types`, `enums`, `utils`).
+- [ ] Navigation has required folders (`navigators`, `types`, `enums`).
 - [ ] Route param list types are centralized under `navigation/types`.
 - [ ] Route/screen enums are centralized under `navigation/enums`.
+- [ ] `RootNavigation.tsx` only composes/switches auth and main flows.
+- [ ] `AuthNavigator.tsx` registers auth screens with auth param list type.
+- [ ] `MainNavigator.tsx` registers app screens with main param list type.
 - [ ] Navigation files do not contain endpoint, DTO, or service logic.
 - [ ] RTK Query handles server cache; slices are used for client state.
 - [ ] Redux typed hooks stay in `store/hooks.ts`.
