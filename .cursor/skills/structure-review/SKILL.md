@@ -55,7 +55,7 @@ Validate store internal structure:
 
 - feature-first folders under `store/<feature>/`
 - expected feature files: `*.slice.ts`, `*.thunk.ts`
-- optional but preferred: `*.selectors.ts`, feature `index.ts`
+- optional but preferred: selector file (`*.selector.ts` or `*.selectors.ts`), feature `index.ts`
 
 ## Checklist
 
@@ -71,6 +71,7 @@ Validate store internal structure:
 - [ ] Domain models are not mixed with transport DTOs.
 - [ ] Routes/endpoints are not defined in UI/store files.
 - [ ] Network responses are mapped before app-wide use when shapes differ.
+- [ ] Feature services are consumed as exported singleton instances when the feature follows singleton service pattern.
 - [ ] Navigation has required folders (`navigators`, `types`, `enums`).
 - [ ] Route param list types are centralized under `navigation/types`.
 - [ ] Route/screen enums are centralized under `navigation/enums`.
@@ -80,7 +81,7 @@ Validate store internal structure:
 - [ ] Navigation files do not contain endpoint, DTO, or service logic.
 - [ ] Store is organized by feature folders (for example `store/auth/`).
 - [ ] Async store flows are implemented in `*.thunk.ts`; sync transitions are in `*.slice.ts`.
-- [ ] Feature selectors live with the feature store files when present.
+- [ ] Feature selectors live with feature store files and follow one naming convention (`*.selector.ts` or `*.selectors.ts`).
 - [ ] Redux typed hooks stay in `store/hooks.ts`.
 - [ ] Global reusable hooks are in `shared/hooks`; feature hooks stay in feature modules.
 - [ ] Global cross-cutting contexts are in `shared/contexts`; feature-only contexts remain local.

@@ -40,7 +40,7 @@ src/
     auth/
       auth.slice.ts
       auth.thunk.ts
-      auth.selectors.ts
+      auth.selector.ts
       index.ts
   shared/
 docs/
@@ -164,6 +164,7 @@ src/network/services/
 Rules:
 
 - Keep one service class per feature as the main API entrypoint (`auth.service.ts`).
+- Export and use one singleton service instance per feature (for example `export const AuthService = new AuthServiceClass()`).
 - Keep endpoint path constants in `routes.ts` only.
 - Keep request/response DTOs in `types/` (`*RequestDto`, `*ResponseDto`).
 - Keep DTO-to-domain transformations in `mappers/`; do not map in UI.
@@ -226,7 +227,7 @@ src/store/
   auth/
     auth.slice.ts
     auth.thunk.ts
-    auth.selectors.ts
+    auth.selector.ts
     index.ts
 ```
 
@@ -235,7 +236,7 @@ src/store/
 - Keep store code feature-first (`store/<feature>/...`), not globally mixed.
 - Keep synchronous state transitions in `*.slice.ts`.
 - Keep async API orchestration in `*.thunk.ts`.
-- Keep feature selectors in feature folder (`*.selectors.ts`).
+- Keep feature selectors in feature folder (`*.selector.ts` or `*.selectors.ts`, one convention only).
 - Thunks may call `network/services/*`; modules should dispatch thunks instead of calling services directly.
 - Keep slice state minimal and UI-friendly (`isLoading`, `error`, session/token flags).
 
@@ -321,7 +322,7 @@ src/
 - keep domain models in `domain/models`
 - keep mappers near feature service
 - keep UI imports pointing to `domain`, not `network`
-- keep server cache in RTK Query instead of regular slices
+- keep async API orchestration in feature thunks and keep sync transitions in slices
 
 ### Do Not
 

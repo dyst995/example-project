@@ -3,8 +3,6 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { AuthService } from '../../network/services/auth/auth.service';
 import type { LoginRequestDto } from '../../network/services/auth/types/login.types';
 
-const authService = new AuthService();
-
 type LoginThunkError = {
   message: string;
 };
@@ -15,7 +13,7 @@ export const loginThunk = createAsyncThunk<
   { rejectValue: LoginThunkError }
 >('auth/login', async (payload, { rejectWithValue }) => {
   try {
-    const response = await authService.login(payload);
+    const response = await AuthService.login(payload);
     return response.data.accessToken;
   } catch (error: unknown) {
     const message =
