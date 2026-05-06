@@ -37,10 +37,11 @@ src/
   store/
     index.ts
     hooks.ts
-    slices/
-    api/
-      baseApi.ts
-      auth.api.ts
+    auth/
+      auth.slice.ts
+      auth.thunk.ts
+      auth.selectors.ts
+      index.ts
   shared/
 docs/
 ```
@@ -78,18 +79,14 @@ Feature UI layer (screens/hooks/components) for presentation behavior.
 
 ### `store`
 
-Contains global application state and server-state integration.
+Contains global application state and async state orchestration.
 
 - `index.ts`
-  - configure Redux store
-  - register reducers and RTK Query middleware
+  - configure Redux store and register feature reducers
 - `hooks.ts`
   - typed hooks (`useAppDispatch`, `useAppSelector`)
-- `slices/`
-  - client-state only (UI preferences, feature flags, local auth flags)
-- `api/`
-  - RTK Query API slices and endpoint definitions
-  - cached server state and request lifecycle
+- `<feature>/`
+  - feature-scoped Redux files (`*.slice.ts`, `*.thunk.ts`, selectors, exports)
 
 ### `shared`
 
@@ -214,49 +211,31 @@ Navigator responsibilities:
 - `AuthNavigator.tsx` must register auth-related screens and use auth param list type.
 - `MainNavigator.tsx` must register authorized/app screens and use main param list type.
 
-## State Management (Redux + RTK Query)
+## State Management (Redux Slice + Thunk)
 
-Use Redux Toolkit for client state and RTK Query for server state.
+Use Redux Toolkit slices for state and `createAsyncThunk` for async feature flows.
 
-### What Goes In RTK Query
-
-- remote data fetching and caching
-- loading/error/request lifecycle
-- invalidation/refetch behavior
-- API-driven state shared across screens
-
-### What Goes In Redux Slices
-
-- local app state not owned by backend
-- user interface state (toggles, selected tabs, onboarding progress)
-- transient flow state that should survive navigation
-
-### What Should Not Be Duplicated
-
-- do not store RTK Query response data again in slices unless there is a clear reason
-- prefer selectors from RTK Query cache for read access
-- only persist minimal auth/session values if needed for bootstrap
-
-### Recommended RTK Query Structure
+### Recommended Store Feature Structure
 
 ```txt
 src/store/
-  api/
-    baseApi.ts
-    auth.api.ts
-    profile.api.ts
-  slices/
-    auth.slice.ts
-    ui.slice.ts
   index.ts
   hooks.ts
+  auth/
+    auth.slice.ts
+    auth.thunk.ts
+    auth.selectors.ts
+    index.ts
 ```
 
-### Integration Rule With Existing Layers
+### Store Rules
 
-- RTK Query endpoints may call `network` services or directly define queries
-- prefer returning domain-shaped data to UI (map in service/query transform)
-- `modules` consume `useXxxQuery/useXxxMutation` hooks and typed selectors
+- Keep store code feature-first (`store/<feature>/...`), not globally mixed.
+- Keep synchronous state transitions in `*.slice.ts`.
+- Keep async API orchestration in `*.thunk.ts`.
+- Keep feature selectors in feature folder (`*.selectors.ts`).
+- Thunks may call `network/services/*`; modules should dispatch thunks instead of calling services directly.
+- Keep slice state minimal and UI-friendly (`isLoading`, `error`, session/token flags).
 
 ## Naming Conventions
 
@@ -327,11 +306,9 @@ src/
       LoginScreen.tsx
       useLoginScreen.ts
   store/
-    api/
-      baseApi.ts
-      auth.api.ts
-    slices/
+    auth/
       auth.slice.ts
+      auth.thunk.ts
 ```
 
 ## Practical Rules

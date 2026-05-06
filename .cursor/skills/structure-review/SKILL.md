@@ -30,7 +30,7 @@ Validate these layer boundaries:
 - `network`: transport concerns (routes, DTOs, service calls, mappers)
 - `domain`: business models and domain logic
 - `modules`: feature UI/hooks
-- `store`: Redux slices and RTK Query APIs
+- `store`: feature-first Redux slices, thunks, and selectors
 - `shared`: reusable hooks, contexts, and shared utilities
 
 Validate module internal structure:
@@ -50,6 +50,12 @@ Validate navigation internal structure:
 - root switch entry is `navigation/RootNavigation.tsx`
 - auth flow navigator is `navigation/navigators/AuthNavigator.tsx`
 - main flow navigator is `navigation/navigators/MainNavigator.tsx`
+
+Validate store internal structure:
+
+- feature-first folders under `store/<feature>/`
+- expected feature files: `*.slice.ts`, `*.thunk.ts`
+- optional but preferred: `*.selectors.ts`, feature `index.ts`
 
 ## Checklist
 
@@ -71,7 +77,9 @@ Validate navigation internal structure:
 - [ ] `AuthNavigator.tsx` registers auth screens with auth param list type.
 - [ ] `MainNavigator.tsx` registers app screens with main param list type.
 - [ ] Navigation files do not contain endpoint, DTO, or service logic.
-- [ ] RTK Query handles server cache; slices are used for client state.
+- [ ] Store is organized by feature folders (for example `store/auth/`).
+- [ ] Async store flows are implemented in `*.thunk.ts`; sync transitions are in `*.slice.ts`.
+- [ ] Feature selectors live with the feature store files when present.
 - [ ] Redux typed hooks stay in `store/hooks.ts`.
 - [ ] Global reusable hooks are in `shared/hooks`; feature hooks stay in feature modules.
 - [ ] Global cross-cutting contexts are in `shared/contexts`; feature-only contexts remain local.

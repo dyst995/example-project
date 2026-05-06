@@ -1,4 +1,4 @@
-import authReducer, { signIn, signOut } from '../slices/authSlice';
+import authReducer, { signIn, signOut } from '../auth/auth.slice';
 
 describe('authSlice', () => {
   it('return initial state', () => {

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { store } from '../../store';
-import { signOut } from '../../store/slices/authSlice';
+import { signOut } from '../../store/auth/auth.slice';
 
 import type { ApiConfig } from './types';
 
