@@ -22,6 +22,12 @@ let runtimeConfig: ApiClientRuntimeConfig = {
   onUnauthorized: () => {},
 };
 
+/**
+ * Injects runtime callbacks used by API interceptors.
+ *
+ * This keeps the network layer decoupled from the Redux store and prevents
+ * circular imports between store initialization and service modules.
+ */
 export const setupApiClient = (configOverrides: Partial<ApiClientRuntimeConfig>) => {
   runtimeConfig = {
     ...runtimeConfig,

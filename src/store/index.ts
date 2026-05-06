@@ -9,6 +9,9 @@ export const store = configureStore({
   },
 });
 
+/**
+ * Wires store-aware callbacks into API interceptors after store creation.
+ */
 setupApiClient({
   getAccessToken: () => store.getState().auth.token,
   onUnauthorized: () => {

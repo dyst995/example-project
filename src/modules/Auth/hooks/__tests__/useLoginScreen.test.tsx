@@ -1,32 +1,25 @@
 import { act, renderHook } from '@testing-library/react-native';
+import {
+  mockedUseAppSelector,
+  setupStoreHooksMock,
+} from '../../../../test/storeHooksMock';
 import { useLoginScreen } from '../useLoginScreen';
-import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { loginThunk } from '../../../../store/auth/auth.thunk';
-
-jest.mock('../../../../store/hooks', () => ({
-  useAppDispatch: jest.fn(),
-  useAppSelector: jest.fn(),
-}));
 
 jest.mock('../../../../store/auth/auth.thunk', () => ({
   loginThunk: jest.fn(),
 }));
 
-const mockedUseAppDispatch = useAppDispatch as jest.MockedFunction<
-  typeof useAppDispatch
->;
-const mockedUseAppSelector = useAppSelector as jest.MockedFunction<
-  typeof useAppSelector
->;
 const mockedLoginThunk = loginThunk as jest.MockedFunction<typeof loginThunk>;
 
 describe('useLoginScreen', () => {
-  const dispatchMock = jest.fn();
+  let dispatchMock: jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockedUseAppDispatch.mockReturnValue(dispatchMock);
-    mockedUseAppSelector.mockReturnValue({ isLoading: false } as any);
+    dispatchMock = setupStoreHooksMock({
+      selectorState: { isLoading: false },
+    }).dispatch;
     mockedLoginThunk.mockReturnValue({ type: 'auth/login/pending' } as any);
     dispatchMock.mockResolvedValue(undefined);
   });
