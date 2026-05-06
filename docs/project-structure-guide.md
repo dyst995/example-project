@@ -35,6 +35,12 @@ src/
     Profile/
     ...
   store/
+    index.ts
+    hooks.ts
+    slices/
+    api/
+      baseApi.ts
+      auth.api.ts
   shared/
 docs/
 ```
@@ -70,6 +76,82 @@ Feature UI layer (screens/hooks/components) for presentation behavior.
 
 - should depend on domain types, not DTOs
 - should not know endpoint paths or axios details
+
+### `store`
+
+Contains global application state and server-state integration.
+
+- `index.ts`
+  - configure Redux store
+  - register reducers and RTK Query middleware
+- `hooks.ts`
+  - typed hooks (`useAppDispatch`, `useAppSelector`)
+- `slices/`
+  - client-state only (UI preferences, feature flags, local auth flags)
+- `api/`
+  - RTK Query API slices and endpoint definitions
+  - cached server state and request lifecycle
+
+### `shared`
+
+Contains reusable app-wide utilities and UI primitives.
+
+- `hooks/` for generic reusable hooks (for example `useDebounce`, `useKeyboard`)
+- `contexts/` for global cross-cutting contexts (for example theme, localization)
+- shared components, constants, helpers used across multiple modules
+
+## Context and Custom Hooks Placement
+
+- Put app-wide reusable hooks in `shared/hooks`.
+- Put Redux typed hooks (`useAppDispatch`, `useAppSelector`) in `store/hooks.ts`.
+- Put feature-specific hooks (for example `useLoginScreen`) inside feature modules.
+- Put global cross-cutting contexts in `shared/contexts`.
+- Put feature-only contexts inside that feature module.
+- Avoid introducing Context for data already managed well by Redux/RTK Query.
+
+## State Management (Redux + RTK Query)
+
+Use Redux Toolkit for client state and RTK Query for server state.
+
+### What Goes In RTK Query
+
+- remote data fetching and caching
+- loading/error/request lifecycle
+- invalidation/refetch behavior
+- API-driven state shared across screens
+
+### What Goes In Redux Slices
+
+- local app state not owned by backend
+- user interface state (toggles, selected tabs, onboarding progress)
+- transient flow state that should survive navigation
+
+### What Should Not Be Duplicated
+
+- do not store RTK Query response data again in slices unless there is a clear reason
+- prefer selectors from RTK Query cache for read access
+- only persist minimal auth/session values if needed for bootstrap
+
+### Recommended RTK Query Structure
+
+```txt
+src/store/
+  api/
+    baseApi.ts
+    auth.api.ts
+    profile.api.ts
+  slices/
+    auth.slice.ts
+    ui.slice.ts
+  index.ts
+  hooks.ts
+```
+
+### Integration Rule With Existing Layers
+
+- RTK Query endpoints may call `network` services or directly define queries
+- prefer returning domain-shaped data to UI (map in service/query transform)
+- `modules` consume `useXxxQuery/useXxxMutation` hooks and typed selectors
 
 ## Naming Conventions
 
@@ -139,6 +221,12 @@ src/
     Auth/
       LoginScreen.tsx
       useLoginScreen.ts
+  store/
+    api/
+      baseApi.ts
+      auth.api.ts
+    slices/
+      auth.slice.ts
 ```
 
 ## Practical Rules
@@ -149,12 +237,14 @@ src/
 - keep domain models in `domain/models`
 - keep mappers near feature service
 - keep UI imports pointing to `domain`, not `network`
+- keep server cache in RTK Query instead of regular slices
 
 ### Do Not
 
 - do not import DTOs directly in screens/hooks
 - do not put endpoint strings in UI/store
 - do not mix network contract types with domain types in one file
+- do not duplicate API cache in Redux slices without a strong reason
 
 ## Migration Plan (Incremental)
 
