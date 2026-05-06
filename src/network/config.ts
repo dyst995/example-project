@@ -9,7 +9,7 @@ export const AppURL = 'https://test.easypay.ge';
 export const config: ApiConfig = {
   baseURL: `${AppURL}/api/v1`,
   timeout: 0,
-  headers: {'Content-Type': 'application/json'},
+  headers: { 'Content-Type': 'application/json' },
 };
 
 export const apiClient = axios.create(config);

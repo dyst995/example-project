@@ -47,4 +47,20 @@ describe('network config interceptors', () => {
     await expect(onRejected(error)).rejects.toBe(error);
     expect(mockDispatch).toHaveBeenCalled();
   });
+
+  it('request interceptor passes through request errors', async () => {
+    require('../config');
+    const onRequestError = mockRequestUse.mock.calls[0][1];
+
+    const requestError = new Error('request failed');
+    await expect(onRequestError(requestError)).rejects.toBe(requestError);
+  });
+
+  it('response interceptor returns response unchanged', () => {
+    require('../config');
+    const onResponseSuccess = mockResponseUse.mock.calls[0][0];
+
+    const response = { data: { ok: true }, status: 200 };
+    expect(onResponseSuccess(response)).toBe(response);
+  });
 });
