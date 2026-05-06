@@ -1,5 +1,5 @@
 import { fireEvent, render } from '@testing-library/react-native';
-import { LoginScreen } from '../LoginScreen';
+import { LoginScreen } from '../screens/LoginScreen';
 
 describe('LoginScren', () => {
   it('renders title and subtitle', () => {

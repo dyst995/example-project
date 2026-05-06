@@ -140,6 +140,8 @@ Rules:
 - Keep hooks in `hooks/`, presentational pieces in `components/`, and screen containers in `screens/`.
 - Keep module view/form types in module `types/`, not in network DTO files.
 - Module code may use domain models and store/query hooks, but should not define endpoints or DTO contracts.
+- Feature module public export (`modules/<Feature>/index.ts`) should export screens only.
+- Keep hooks/components/types internal to module folders and import them via local paths inside the feature.
 
 ## Service Structure Standard
 

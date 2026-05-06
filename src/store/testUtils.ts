@@ -64,11 +64,10 @@
 // ---
 
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import { authReducer, profileReducer } from './slices';
+import authReducer from './auth/auth.slice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
-  profile: profileReducer,
 });
 
 export type TestRootState = ReturnType<typeof rootReducer>;

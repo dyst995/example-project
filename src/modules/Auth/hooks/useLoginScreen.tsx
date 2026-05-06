@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { loginThunk } from '../../store/auth/auth.thunk';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { loginThunk } from '../../../store/auth/auth.thunk';
+import { selectAuthState } from '../../../store/auth/auth.selector';
 
 export const useLoginScreen = () => {
   const dispatch = useAppDispatch();
-  const isLoading = useAppSelector(state => state.auth.isLoading);
+  const { isLoading } = useAppSelector(selectAuthState);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 

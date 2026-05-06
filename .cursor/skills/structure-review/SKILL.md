@@ -66,6 +66,7 @@ Validate store internal structure:
 - [ ] Module has required feature folders (`screens`, `hooks`) for new/structured features.
 - [ ] Optional folders (`components`, `types`, `utils`) are present only when needed and should not be treated as required.
 - [ ] If module view/form types exist, keep them in module `types/`, not in network DTO files.
+- [ ] Feature module public exports (`modules/<Feature>/index.ts`) expose screens only.
 - [ ] UI/modules do not import DTOs directly.
 - [ ] Domain models are not mixed with transport DTOs.
 - [ ] Routes/endpoints are not defined in UI/store files.
