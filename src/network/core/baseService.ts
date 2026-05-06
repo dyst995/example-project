@@ -1,7 +1,7 @@
-import { apiClient } from './config';
-import type { ApiResponse, HttpMethod } from './core/types';
+import { apiClient } from '../core';
+import type { ApiResult, HttpMethod } from './types';
 
-export type RequestData = Record<string, unknown> | FormData;
+export type RequestData = object | FormData;
 export type RequestParams = Record<string, string | number | boolean>;
 export type RequestHeaders = Record<string, string>;
 
@@ -12,7 +12,7 @@ export class BaseService {
     data?: RequestData,
     params?: RequestParams,
     headers?: RequestHeaders,
-  ): Promise<ApiResponse<T>> {
+  ): ApiResult<T> {
     try {
       const response = await apiClient.request({
         method,
@@ -47,7 +47,7 @@ export class BaseService {
     url: string,
     params?: RequestParams,
     headers?: RequestHeaders,
-  ): Promise<ApiResponse<T>> {
+  ): ApiResult<T> {
     return this.request<T>('GET', url, undefined, params, headers);
   }
 
@@ -55,7 +55,7 @@ export class BaseService {
     url: string,
     data?: RequestData,
     headers?: RequestHeaders,
-  ): Promise<ApiResponse<T>> {
+  ): ApiResult<T> {
     return this.request<T>('POST', url, data, undefined, headers);
   }
 
@@ -63,14 +63,11 @@ export class BaseService {
     url: string,
     data?: RequestData,
     headers?: RequestHeaders,
-  ): Promise<ApiResponse<T>> {
+  ): ApiResult<T> {
     return this.request<T>('PUT', url, data, undefined, headers);
   }
 
-  protected delete<T>(
-    url: string,
-    headers?: RequestHeaders,
-  ): Promise<ApiResponse<T>> {
+  protected delete<T>(url: string, headers?: RequestHeaders): ApiResult<T> {
     return this.request<T>('DELETE', url, undefined, undefined, headers);
   }
 
@@ -78,7 +75,7 @@ export class BaseService {
     url: string,
     data?: RequestData,
     headers?: RequestHeaders,
-  ): Promise<ApiResponse<T>> {
+  ): ApiResult<T> {
     return this.request<T>('PATCH', url, data, undefined, headers);
   }
 }

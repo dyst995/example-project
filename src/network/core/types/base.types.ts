@@ -1,4 +1,4 @@
-import type { RequestHeaders } from '../../baseService';
+import type { RequestHeaders } from '../../core';
 
 export interface ApiResponse<T> {
   data: T;
@@ -18,5 +18,7 @@ export interface ApiConfig {
   timeout?: number;
   headers?: Record<string, string>;
 }
+
+export type ApiResult<T> = Promise<ApiResponse<T>>;
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';

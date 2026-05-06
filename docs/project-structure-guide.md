@@ -56,10 +56,8 @@ Contains transport-layer code (HTTP, endpoints, DTOs).
   - base service class
   - common API response/error types
 - `services/<feature>/`
-  - `routes.ts` (endpoint paths)
-  - `*.service.ts` (API calls)
-  - `types/*.types.ts` (DTOs)
-  - `mappers/*.mapper.ts` (DTO to domain)
+  - feature API modules and related transport files
+  - see `Service Structure Standard` below for exact file layout
 
 ### `domain`
 
@@ -76,6 +74,7 @@ Feature UI layer (screens/hooks/components) for presentation behavior.
 
 - should depend on domain types, not DTOs
 - should not know endpoint paths or axios details
+- if functionality is only used by one module, keep it inside that module
 
 ### `store`
 
@@ -96,18 +95,82 @@ Contains global application state and server-state integration.
 
 Contains reusable app-wide utilities and UI primitives.
 
+- `components/` for reusable shared UI components
 - `hooks/` for generic reusable hooks (for example `useDebounce`, `useKeyboard`)
 - `contexts/` for global cross-cutting contexts (for example theme, localization)
+- `utils/` for shared cross-module utility helpers
 - shared components, constants, helpers used across multiple modules
+- only move functionality to `shared` when it is reused across modules
+- do not create top-level `src/utils`; shared utilities must be under `src/shared/utils`
+- do not create top-level `src/components`; shared components must be under `src/shared/components`
 
 ## Context and Custom Hooks Placement
 
+- Keep functionality in its owning module when it is not shared.
+- Move functionality to `shared` only when multiple modules reuse it.
 - Put app-wide reusable hooks in `shared/hooks`.
 - Put Redux typed hooks (`useAppDispatch`, `useAppSelector`) in `store/hooks.ts`.
 - Put feature-specific hooks (for example `useLoginScreen`) inside feature modules.
 - Put global cross-cutting contexts in `shared/contexts`.
 - Put feature-only contexts inside that feature module.
 - Avoid introducing Context for data already managed well by Redux/RTK Query.
+
+## Module Structure Standard
+
+Use feature-first module structure as the default.
+
+```txt
+src/modules/
+  Auth/
+    screens/
+      LoginScreen.tsx
+    hooks/
+      useLoginScreen.ts
+    components/
+      LoginForm.tsx
+    types/
+      login.types.ts
+    utils/
+      login.utils.ts
+    context/           (optional, feature-only context)
+    __tests__/
+```
+
+Rules:
+
+- Keep module-only functionality inside that module.
+- Move functionality to `shared` only when reused by multiple modules.
+- Keep hooks in `hooks/`, presentational pieces in `components/`, and screen containers in `screens/`.
+- Keep module view/form types in module `types/`, not in network DTO files.
+- Module code may use domain models and store/query hooks, but should not define endpoints or DTO contracts.
+
+## Service Structure Standard
+
+Use feature-first structure under `network/services`.
+
+```txt
+src/network/services/
+  auth/
+    auth.service.ts
+    routes.ts
+    types/
+      login.types.ts
+      user.types.ts
+    mappers/
+      auth.mapper.ts
+    __tests__/
+      auth.service.test.ts
+```
+
+Rules:
+
+- Keep one service class per feature as the main API entrypoint (`auth.service.ts`).
+- Keep endpoint path constants in `routes.ts` only.
+- Keep request/response DTOs in `types/` (`*RequestDto`, `*ResponseDto`).
+- Keep DTO-to-domain transformations in `mappers/`; do not map in UI.
+- Keep API call details (HTTP method, params, headers) inside service layer.
+- Keep service methods focused by use case (`login`, `refreshToken`, `logout`).
+- Keep service internals using `BaseService` and core response wrappers for consistency.
 
 ## State Management (Redux + RTK Query)
 

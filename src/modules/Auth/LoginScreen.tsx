@@ -1,10 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { DefaultInput } from '../../shared/Inputs';
-import { DefaultButton } from '../../shared/Buttons';
+import { DefaultInput } from '../../shared/components/Inputs';
+import { DefaultButton } from '../../shared/components/Buttons';
 import { useLoginScreen } from './useLoginScreen';
-
-import { UserModel } from '../../network/services/auth/models/user.model';
 
 type Props = {};
 
