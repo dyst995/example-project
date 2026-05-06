@@ -1,5 +1,5 @@
 import { apiClient } from './config';
-import type { ApiResponse, HttpMethod } from './types';
+import type { ApiResponse, HttpMethod } from './core/types';
 
 export type RequestData = Record<string, unknown> | FormData;
 export type RequestParams = Record<string, string | number | boolean>;

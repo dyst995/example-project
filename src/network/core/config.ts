@@ -1,10 +1,10 @@
 import axios from 'axios';
-import { store } from '../store';
-import { signOut } from '../store/slices/authSlice';
+import { store } from '../../store';
+import { signOut } from '../../store/slices/authSlice';
 
 import type { ApiConfig } from './types';
 
-export const AppURL = 'https://test.easypay.ge';
+export const AppURL = 'https://mci.dev.ol.ge/mci-back/resources/front/';
 
 export const config: ApiConfig = {
   baseURL: `${AppURL}/api/v1`,

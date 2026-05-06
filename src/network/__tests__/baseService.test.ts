@@ -1,5 +1,5 @@
 import { BaseService } from '../baseService';
-import { apiClient } from '../config';
+import { apiClient } from '../core/config';
 
 jest.mock('../config', () => ({
   apiClient: {

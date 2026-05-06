@@ -1,4 +1,4 @@
-import type { RequestHeaders } from '../baseService';
+import type { RequestHeaders } from '../../baseService';
 
 export interface ApiResponse<T> {
   data: T;
