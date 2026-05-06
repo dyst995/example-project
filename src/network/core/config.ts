@@ -7,7 +7,7 @@ import type { ApiConfig } from './types';
 export const AppURL = 'https://mci.dev.ol.ge/mci-back/resources/front/';
 
 export const config: ApiConfig = {
-  baseURL: `${AppURL}/api/v1`,
+  baseURL: AppURL,
   timeout: 0,
   headers: { 'Content-Type': 'application/json' },
 };

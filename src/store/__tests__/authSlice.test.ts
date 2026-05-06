@@ -7,6 +7,8 @@ describe('authSlice', () => {
     expect(state).toEqual({
       authenticated: false,
       token: null,
+      isLoading: false,
+      error: null,
     });
   });
 
@@ -14,6 +16,8 @@ describe('authSlice', () => {
     const prevState = {
       authenticated: false,
       token: null,
+      isLoading: false,
+      error: null,
     };
 
     const state = authReducer(prevState, signIn('token-123'));
@@ -21,6 +25,8 @@ describe('authSlice', () => {
     expect(state).toEqual({
       authenticated: true,
       token: 'token-123',
+      isLoading: false,
+      error: null,
     });
   });
 
@@ -28,12 +34,16 @@ describe('authSlice', () => {
     const prevState = {
       authenticated: true,
       token: 'token-123',
+      isLoading: false,
+      error: null,
     };
 
     const state = authReducer(prevState, signOut());
     expect(state).toEqual({
       authenticated: false,
       token: null,
+      isLoading: false,
+      error: null,
     });
   });
 });

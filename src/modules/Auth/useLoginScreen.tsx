@@ -1,10 +1,14 @@
 import { useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { loginThunk } from '../../store/auth/auth.thunk';
 
 export const useLoginScreen = () => {
+  const dispatch = useAppDispatch();
+  const isLoading = useAppSelector(state => state.auth.isLoading);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const isDisabled = !username.trim() || !password.trim();
+  const isDisabled = !username.trim() || !password.trim() || isLoading;
 
   const onUsernameChange = (value: string) => {
     setUsername(value);
@@ -14,7 +18,18 @@ export const useLoginScreen = () => {
     setPassword(value);
   };
 
-  const onLogin = () => {};
+  const onLogin = async () => {
+    if (isDisabled) {
+      return;
+    }
+
+    await dispatch(
+      loginThunk({
+        username: username.trim(),
+        password,
+      }),
+    );
+  };
 
   return {
     isDisabled,
