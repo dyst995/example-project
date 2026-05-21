@@ -1,0 +1,1 @@
+export { PasscodePinPad } from './PasscodePinPad';

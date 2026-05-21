@@ -1,5 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
+import { PASSCODE_PIN_LENGTH } from '../../shared/constants/passcode';
 import { KeychainStorage } from '../../shared/security/keychain.storage';
 import { passcodePreferences } from '../../shared/storage/passcodePreferences';
 import { loginThunk } from '../auth/auth.thunk';
@@ -7,8 +8,6 @@ import { loginThunk } from '../auth/auth.thunk';
 type PasscodeThunkError = {
   message: string;
 };
-
-const MIN_PASSCODE_LENGTH = 4;
 
 export const hydratePasscodeThunk = createAsyncThunk<boolean>(
   'passcode/hydrate',
@@ -29,9 +28,9 @@ export const activatePasscodeThunk = createAsyncThunk<
   async ({ passcode, confirmPasscode }, { rejectWithValue }) => {
     const trimmedPasscode = passcode.trim();
 
-    if (trimmedPasscode.length < MIN_PASSCODE_LENGTH) {
+    if (trimmedPasscode.length < PASSCODE_PIN_LENGTH) {
       return rejectWithValue({
-        message: `Passcode must be at least ${MIN_PASSCODE_LENGTH} digits`,
+        message: `Passcode must be ${PASSCODE_PIN_LENGTH} digits`,
       });
     }
 

@@ -1,5 +1,6 @@
 import { device, element, by, expect, waitFor } from 'detox';
 import { loginAsDemoUser } from '../helpers/login';
+import { enterPasscodePin } from '../helpers/passcode';
 
 const DEMO_PASSCODE = '2468';
 
@@ -22,10 +23,15 @@ describe('Passcode flow', () => {
     );
 
     await element(by.id('dashboard-passcode-setup-button')).tap();
-    await element(by.id('passcode-setup-input')).typeText(DEMO_PASSCODE);
-    await element(by.id('passcode-setup-confirm-input')).typeText(DEMO_PASSCODE);
-    await device.pressBack();
-    await element(by.id('passcode-setup-submit-button')).tap();
+    await waitFor(element(by.id('passcode-setup-pin-dots')))
+      .toBeVisible()
+      .withTimeout(5000);
+
+    await enterPasscodePin('passcode-setup', DEMO_PASSCODE);
+    await waitFor(element(by.text('Confirm passcode')))
+      .toBeVisible()
+      .withTimeout(5000);
+    await enterPasscodePin('passcode-setup', DEMO_PASSCODE);
 
     await waitFor(element(by.id('dashboard-passcode-status')))
       .toHaveText('Enabled')
@@ -33,14 +39,12 @@ describe('Passcode flow', () => {
 
     await element(by.id('dashboard-logout-button')).tap();
 
-    await waitFor(element(by.id('passcode-login-input')))
+    await waitFor(element(by.id('passcode-login-pin-dots')))
       .toBeVisible()
       .withTimeout(10000);
     await expect(element(by.id('login-username-input'))).not.toExist();
 
-    await element(by.id('passcode-login-input')).typeText(DEMO_PASSCODE);
-    await device.pressBack();
-    await element(by.id('passcode-login-submit-button')).tap();
+    await enterPasscodePin('passcode-login', DEMO_PASSCODE);
 
     await waitFor(element(by.text('Dashboard')))
       .toBeVisible()

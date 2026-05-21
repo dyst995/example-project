@@ -27,22 +27,27 @@ describe('usePasscodeSetupScreen', () => {
     } as any);
   });
 
-  it('starts disabled with empty passcodes', () => {
+  it('moves to confirm step after create pin is completed', async () => {
     const { result } = renderHook(() => usePasscodeSetupScreen());
 
-    expect(result.current.isDisabled).toBe(true);
+    await act(async () => {
+      await result.current.onPinComplete('1234');
+    });
+
+    expect(result.current.step).toBe('confirm');
+    expect(result.current.stepTitle).toBe('Confirm passcode');
+    expect(mockedActivatePasscodeThunk).not.toHaveBeenCalled();
   });
 
-  it('dispatches activatePasscodeThunk', async () => {
+  it('dispatches activatePasscodeThunk after confirm pin is completed', async () => {
     const { result } = renderHook(() => usePasscodeSetupScreen());
 
-    act(() => {
-      result.current.onPasscodeChange('1234');
-      result.current.onConfirmPasscodeChange('1234');
+    await act(async () => {
+      await result.current.onPinComplete('1234');
     });
 
     await act(async () => {
-      await result.current.onActivate();
+      await result.current.onPinComplete('1234');
     });
 
     expect(mockedActivatePasscodeThunk).toHaveBeenCalledWith({

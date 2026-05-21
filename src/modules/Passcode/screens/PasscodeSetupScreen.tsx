@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAppSelector } from '../../../store/hooks';
 import { selectPasscodeEnabled } from '../../../store/passcode/passcode.selector';
-import { DefaultInput } from '../../../shared/components/Inputs';
-import { DefaultButton } from '../../../shared/components/Buttons';
+import { PasscodePinPad } from '../../../shared/components/Passcode';
 import { usePasscodeSetupScreen } from '../hooks';
 
 type Props = {};
@@ -13,14 +12,13 @@ export const PasscodeSetupScreen: React.FC<Props> = () => {
   const navigation = useNavigation();
   const passcodeEnabled = useAppSelector(selectPasscodeEnabled);
   const {
-    passcode,
-    confirmPasscode,
-    isDisabled,
+    pin,
+    stepTitle,
+    stepSubtitle,
     isActivating,
     error,
-    onPasscodeChange,
-    onConfirmPasscodeChange,
-    onActivate,
+    onPinChange,
+    onPinComplete,
   } = usePasscodeSetupScreen();
 
   useEffect(() => {
@@ -34,44 +32,34 @@ export const PasscodeSetupScreen: React.FC<Props> = () => {
       <View style={styles.card}>
         <Text style={styles.title}>Activate passcode</Text>
         <Text style={styles.subtitle}>
-          Create a passcode to unlock the app. Your username and password stay
-          saved securely in the keychain.
+          Your username and password stay saved securely in the keychain.
         </Text>
 
-        <DefaultInput
-          label="Passcode"
-          value={passcode}
-          onChangeText={onPasscodeChange}
-          secureTextEntry
-          keyboardType="number-pad"
-          autoCapitalize="none"
-          autoCorrect={false}
-          placeholder="Enter passcode"
-          testID="passcode-setup-input"
+        <Text style={styles.stepTitle} testID="passcode-setup-step-title">
+          {stepTitle}
+        </Text>
+        <Text style={styles.stepSubtitle}>{stepSubtitle}</Text>
+
+        {isActivating ? (
+          <ActivityIndicator
+            style={styles.loader}
+            testID="passcode-setup-loading"
+          />
+        ) : null}
+
+        <PasscodePinPad
+          value={pin}
+          onChange={onPinChange}
+          onComplete={onPinComplete}
+          disabled={isActivating}
+          testIDPrefix="passcode-setup"
         />
 
-        <DefaultInput
-          label="Confirm passcode"
-          value={confirmPasscode}
-          onChangeText={onConfirmPasscodeChange}
-          secureTextEntry
-          keyboardType="number-pad"
-          autoCapitalize="none"
-          autoCorrect={false}
-          placeholder="Confirm passcode"
-          containerStyle={styles.confirmInput}
-          testID="passcode-setup-confirm-input"
-        />
-
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-
-        <DefaultButton
-          title={isActivating ? 'Activating...' : 'Activate passcode'}
-          onPress={onActivate}
-          disabled={isDisabled}
-          style={styles.submitButton}
-          testID="passcode-setup-submit-button"
-        />
+        {error ? (
+          <Text style={styles.error} testID="passcode-setup-error">
+            {error}
+          </Text>
+        ) : null}
       </View>
     </View>
   );
@@ -87,6 +75,7 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 16,
     padding: 18,
+    alignItems: 'center',
   },
   title: {
     fontSize: 24,
@@ -97,17 +86,27 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: '#6B7280',
-    marginBottom: 16,
+    marginBottom: 20,
+    textAlign: 'center',
   },
-  confirmInput: {
-    marginTop: 12,
+  stepTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 4,
+  },
+  stepSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 8,
+  },
+  loader: {
+    marginVertical: 12,
   },
   error: {
     color: '#DC2626',
     fontSize: 14,
-    marginTop: 12,
-  },
-  submitButton: {
-    marginTop: 20,
+    marginTop: 16,
+    textAlign: 'center',
   },
 });

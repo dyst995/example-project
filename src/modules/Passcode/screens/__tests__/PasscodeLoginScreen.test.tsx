@@ -11,33 +11,40 @@ const mockedHook = usePasscodeLoginScreen as jest.MockedFunction<
 >;
 
 describe('PasscodeLoginScreen', () => {
-  const onUnlock = jest.fn();
+  const onPinComplete = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
     mockedHook.mockReturnValue({
-      passcode: '1234',
-      isDisabled: false,
+      pin: '',
       isUnlocking: false,
       error: null,
-      onPasscodeChange: jest.fn(),
-      onUnlock,
+      onPinChange: jest.fn(),
+      onPinComplete,
     });
   });
 
-  it('renders passcode login form', () => {
+  it('renders passcode pin pad', () => {
     const { getByText, getByTestId } = render(<PasscodeLoginScreen />);
 
     expect(getByText('Enter passcode')).toBeVisible();
-    expect(getByTestId('passcode-login-input')).toBeVisible();
-    expect(getByTestId('passcode-login-submit-button')).toBeVisible();
+    expect(getByTestId('passcode-login-pin-dots')).toBeVisible();
+    expect(getByTestId('passcode-login-pin-key-1')).toBeVisible();
   });
 
-  it('calls onUnlock when submit is pressed', () => {
+  it('shows error message', () => {
+    mockedHook.mockReturnValue({
+      pin: '12',
+      isUnlocking: false,
+      error: 'Incorrect passcode',
+      onPinChange: jest.fn(),
+      onPinComplete,
+    });
+
     const { getByTestId } = render(<PasscodeLoginScreen />);
 
-    fireEvent.press(getByTestId('passcode-login-submit-button'));
-
-    expect(onUnlock).toHaveBeenCalledTimes(1);
+    expect(getByTestId('passcode-login-error')).toHaveTextContent(
+      'Incorrect passcode',
+    );
   });
 });

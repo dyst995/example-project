@@ -7,29 +7,22 @@ import { clearPasscodeError } from '../../../store/passcode/passcode.slice';
 export const usePasscodeLoginScreen = () => {
   const dispatch = useAppDispatch();
   const { isUnlocking, error } = useAppSelector(selectPasscodeState);
-  const [passcode, setPasscode] = useState('');
+  const [pin, setPin] = useState('');
 
-  const isDisabled = !passcode.trim() || isUnlocking;
-
-  const onPasscodeChange = (value: string) => {
+  const onPinChange = (value: string) => {
     dispatch(clearPasscodeError());
-    setPasscode(value);
+    setPin(value);
   };
 
-  const onUnlock = async () => {
-    if (isDisabled) {
-      return;
-    }
-
-    await dispatch(passcodeLoginThunk({ passcode }));
+  const onPinComplete = async (value: string) => {
+    await dispatch(passcodeLoginThunk({ passcode: value }));
   };
 
   return {
-    passcode,
-    isDisabled,
+    pin,
     isUnlocking,
     error,
-    onPasscodeChange,
-    onUnlock,
+    onPinChange,
+    onPinComplete,
   };
 };

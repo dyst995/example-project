@@ -4,46 +4,52 @@ import { activatePasscodeThunk } from '../../../store/passcode/passcode.thunk';
 import { selectPasscodeState } from '../../../store/passcode/passcode.selector';
 import { clearPasscodeError } from '../../../store/passcode/passcode.slice';
 
+type SetupStep = 'create' | 'confirm';
+
 export const usePasscodeSetupScreen = () => {
   const dispatch = useAppDispatch();
   const { isActivating, error } = useAppSelector(selectPasscodeState);
+  const [step, setStep] = useState<SetupStep>('create');
+  const [pin, setPin] = useState('');
   const [passcode, setPasscode] = useState('');
-  const [confirmPasscode, setConfirmPasscode] = useState('');
 
-  const isDisabled =
-    !passcode.trim() || !confirmPasscode.trim() || isActivating;
+  const stepTitle =
+    step === 'create' ? 'Create passcode' : 'Confirm passcode';
+  const stepSubtitle =
+    step === 'create'
+      ? 'Choose a 4-digit passcode'
+      : 'Enter the same passcode again';
 
-  const onPasscodeChange = (value: string) => {
+  const onPinChange = (value: string) => {
     dispatch(clearPasscodeError());
-    setPasscode(value);
+    setPin(value);
   };
 
-  const onConfirmPasscodeChange = (value: string) => {
-    dispatch(clearPasscodeError());
-    setConfirmPasscode(value);
-  };
-
-  const onActivate = async () => {
-    if (isDisabled) {
+  const onPinComplete = async (value: string) => {
+    if (step === 'create') {
+      setPasscode(value);
+      setPin('');
+      setStep('confirm');
       return;
     }
 
     await dispatch(
       activatePasscodeThunk({
         passcode,
-        confirmPasscode,
+        confirmPasscode: value,
       }),
     );
+    setPin('');
   };
 
   return {
-    passcode,
-    confirmPasscode,
-    isDisabled,
+    pin,
+    step,
+    stepTitle,
+    stepSubtitle,
     isActivating,
     error,
-    onPasscodeChange,
-    onConfirmPasscodeChange,
-    onActivate,
+    onPinChange,
+    onPinComplete,
   };
 };

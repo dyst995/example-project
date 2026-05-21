@@ -27,25 +27,11 @@ describe('usePasscodeLoginScreen', () => {
     } as any);
   });
 
-  it('does not unlock with empty passcode', async () => {
+  it('dispatches passcodeLoginThunk when pin is completed', async () => {
     const { result } = renderHook(() => usePasscodeLoginScreen());
 
     await act(async () => {
-      await result.current.onUnlock();
-    });
-
-    expect(mockedPasscodeLoginThunk).not.toHaveBeenCalled();
-  });
-
-  it('dispatches passcodeLoginThunk', async () => {
-    const { result } = renderHook(() => usePasscodeLoginScreen());
-
-    act(() => {
-      result.current.onPasscodeChange('1234');
-    });
-
-    await act(async () => {
-      await result.current.onUnlock();
+      await result.current.onPinComplete('1234');
     });
 
     expect(mockedPasscodeLoginThunk).toHaveBeenCalledWith({ passcode: '1234' });

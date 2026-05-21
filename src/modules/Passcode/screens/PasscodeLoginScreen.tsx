@@ -1,20 +1,13 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { DefaultInput } from '../../../shared/components/Inputs';
-import { DefaultButton } from '../../../shared/components/Buttons';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { PasscodePinPad } from '../../../shared/components/Passcode';
 import { usePasscodeLoginScreen } from '../hooks';
 
 type Props = {};
 
 export const PasscodeLoginScreen: React.FC<Props> = () => {
-  const {
-    passcode,
-    isDisabled,
-    isUnlocking,
-    error,
-    onPasscodeChange,
-    onUnlock,
-  } = usePasscodeLoginScreen();
+  const { pin, isUnlocking, error, onPinChange, onPinComplete } =
+    usePasscodeLoginScreen();
 
   return (
     <View style={styles.container}>
@@ -22,27 +15,26 @@ export const PasscodeLoginScreen: React.FC<Props> = () => {
         <Text style={styles.title}>Enter passcode</Text>
         <Text style={styles.subtitle}>Unlock with your passcode to continue</Text>
 
-        <DefaultInput
-          label="Passcode"
-          value={passcode}
-          onChangeText={onPasscodeChange}
-          secureTextEntry
-          keyboardType="number-pad"
-          autoCapitalize="none"
-          autoCorrect={false}
-          placeholder="Enter passcode"
-          testID="passcode-login-input"
+        {isUnlocking ? (
+          <ActivityIndicator
+            style={styles.loader}
+            testID="passcode-login-loading"
+          />
+        ) : null}
+
+        <PasscodePinPad
+          value={pin}
+          onChange={onPinChange}
+          onComplete={onPinComplete}
+          disabled={isUnlocking}
+          testIDPrefix="passcode-login"
         />
 
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-
-        <DefaultButton
-          title={isUnlocking ? 'Unlocking...' : 'Unlock'}
-          onPress={onUnlock}
-          disabled={isDisabled}
-          style={styles.submitButton}
-          testID="passcode-login-submit-button"
-        />
+        {error ? (
+          <Text style={styles.error} testID="passcode-login-error">
+            {error}
+          </Text>
+        ) : null}
       </View>
     </View>
   );
@@ -58,6 +50,7 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 16,
     padding: 18,
+    alignItems: 'center',
   },
   title: {
     fontSize: 24,
@@ -68,14 +61,16 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: '#6B7280',
-    marginBottom: 16,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  loader: {
+    marginVertical: 12,
   },
   error: {
     color: '#DC2626',
     fontSize: 14,
-    marginTop: 12,
-  },
-  submitButton: {
-    marginTop: 20,
+    marginTop: 16,
+    textAlign: 'center',
   },
 });
