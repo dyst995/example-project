@@ -14,3 +14,30 @@ try {
 } catch {
   jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 }
+
+jest.mock('react-native-keychain', () => ({
+  ACCESSIBLE: { WHEN_UNLOCKED: 'WHEN_UNLOCKED' },
+  setGenericPassword: jest.fn(() => Promise.resolve(true)),
+  getGenericPassword: jest.fn(() => Promise.resolve(false)),
+  resetGenericPassword: jest.fn(() => Promise.resolve(true)),
+}));
+
+jest.mock('react-native-mmkv', () => {
+  const stores = new Map();
+
+  return {
+    createMMKV: jest.fn(({ id }) => {
+      if (!stores.has(id)) {
+        stores.set(id, new Map());
+      }
+      const store = stores.get(id);
+
+      return {
+        getBoolean: jest.fn(key => store.get(key) ?? false),
+        set: jest.fn((key, value) => {
+          store.set(key, value);
+        }),
+      };
+    }),
+  };
+});

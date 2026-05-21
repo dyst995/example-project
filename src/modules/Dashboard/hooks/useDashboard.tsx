@@ -5,10 +5,12 @@ import {
   resetActivity,
 } from '../../../store/dashboard/dashboard.slice';
 import { selectActivityCount } from '../../../store/dashboard/dashboard.selector';
+import { selectPasscodeEnabled } from '../../../store/passcode/passcode.selector';
 
 export const useDashboard = () => {
   const dispatch = useAppDispatch();
   const activityCount = useAppSelector(selectActivityCount);
+  const passcodeEnabled = useAppSelector(selectPasscodeEnabled);
 
   const onIncrement = () => {
     dispatch(incrementActivity());
@@ -24,6 +26,7 @@ export const useDashboard = () => {
 
   return {
     activityCount,
+    passcodeEnabled,
     onIncrement,
     onReset,
     onLogout,

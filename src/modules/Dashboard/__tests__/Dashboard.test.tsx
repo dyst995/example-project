@@ -2,16 +2,31 @@ import { fireEvent } from '@testing-library/react-native';
 import { Dashboard } from '../Dashboard';
 import { renderWithProvider } from '../../../test/renderWithProvider';
 
+jest.mock('@react-navigation/native', () => ({
+  useNavigation: () => ({ navigate: jest.fn(), goBack: jest.fn() }),
+}));
+
+const authenticatedState = {
+  auth: {
+    authenticated: true,
+    token: 'token',
+    isLoading: false,
+    error: null,
+  },
+  passcode: {
+    isEnabled: false,
+    isHydrated: true,
+    isActivating: false,
+    isUnlocking: false,
+    error: null,
+  },
+};
+
 describe('Dashboard', () => {
   it('renders activity count from store', () => {
     const { getByTestId } = renderWithProvider(<Dashboard />, {
       preloadedState: {
-        auth: {
-          authenticated: true,
-          token: 'token',
-          isLoading: false,
-          error: null,
-        },
+        ...authenticatedState,
         dashboard: { activityCount: 3 },
       },
     });
@@ -21,14 +36,7 @@ describe('Dashboard', () => {
 
   it('increments activity count when Add activity is pressed', () => {
     const { getByTestId, store } = renderWithProvider(<Dashboard />, {
-      preloadedState: {
-        auth: {
-          authenticated: true,
-          token: 'token',
-          isLoading: false,
-          error: null,
-        },
-      },
+      preloadedState: authenticatedState,
     });
 
     fireEvent.press(getByTestId('dashboard-increment-button'));
@@ -41,12 +49,7 @@ describe('Dashboard', () => {
   it('resets activity count when Reset is pressed', () => {
     const { getByTestId, store } = renderWithProvider(<Dashboard />, {
       preloadedState: {
-        auth: {
-          authenticated: true,
-          token: 'token',
-          isLoading: false,
-          error: null,
-        },
+        ...authenticatedState,
         dashboard: { activityCount: 5 },
       },
     });
@@ -59,19 +62,40 @@ describe('Dashboard', () => {
 
   it('dispatches signOut when Log out is pressed', () => {
     const { getByTestId, store } = renderWithProvider(<Dashboard />, {
-      preloadedState: {
-        auth: {
-          authenticated: true,
-          token: 'token',
-          isLoading: false,
-          error: null,
-        },
-      },
+      preloadedState: authenticatedState,
     });
 
     fireEvent.press(getByTestId('dashboard-logout-button'));
 
     expect(store.getState().auth.authenticated).toBe(false);
     expect(store.getState().auth.token).toBeNull();
+  });
+
+  it('shows passcode setup when passcode is disabled', () => {
+    const { getByTestId } = renderWithProvider(<Dashboard />, {
+      preloadedState: authenticatedState,
+    });
+
+    expect(getByTestId('dashboard-passcode-status').props.children).toBe(
+      'Not set up',
+    );
+    expect(getByTestId('dashboard-passcode-setup-button')).toBeVisible();
+  });
+
+  it('hides passcode setup when passcode is enabled', () => {
+    const { getByTestId, queryByTestId } = renderWithProvider(<Dashboard />, {
+      preloadedState: {
+        ...authenticatedState,
+        passcode: {
+          ...authenticatedState.passcode,
+          isEnabled: true,
+        },
+      },
+    });
+
+    expect(getByTestId('dashboard-passcode-status').props.children).toBe(
+      'Enabled',
+    );
+    expect(queryByTestId('dashboard-passcode-setup-button')).toBeNull();
   });
 });

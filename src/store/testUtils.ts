@@ -66,10 +66,12 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import authReducer from './auth/auth.slice';
 import dashboardReducer from './dashboard/dashboard.slice';
+import passcodeReducer from './passcode/passcode.slice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
   dashboard: dashboardReducer,
+  passcode: passcodeReducer,
 });
 
 export type TestRootState = ReturnType<typeof rootReducer>;

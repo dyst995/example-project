@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './auth/auth.slice';
 import dashboardReducer from './dashboard/dashboard.slice';
+import passcodeReducer from './passcode/passcode.slice';
 import { signOut } from './auth/auth.slice';
 import { setupApiClient } from '../network/core';
 
@@ -8,6 +9,7 @@ export const store = configureStore({
   reducer: {
     auth: authReducer,
     dashboard: dashboardReducer,
+    passcode: passcodeReducer,
   },
 });
 

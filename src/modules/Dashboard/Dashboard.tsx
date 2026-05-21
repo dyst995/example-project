@@ -1,12 +1,24 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { DefaultButton } from '../../shared/components/Buttons';
+import { MainNavigatorParams } from '../../navigation/types';
+import { MainNavigatorScreens } from '../../navigation/enums';
 import { useDashboard } from './hooks';
 
 type Props = {};
 
 export const Dashboard: React.FC<Props> = () => {
-  const { activityCount, onIncrement, onReset, onLogout } = useDashboard();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<MainNavigatorParams>>();
+  const {
+    activityCount,
+    passcodeEnabled,
+    onIncrement,
+    onReset,
+    onLogout,
+  } = useDashboard();
 
   return (
     <View style={styles.container}>
@@ -32,6 +44,23 @@ export const Dashboard: React.FC<Props> = () => {
           style={styles.actionButton}
           testID="dashboard-reset-button"
         />
+      </View>
+
+      <View style={styles.passcodeCard}>
+        <Text style={styles.cardLabel}>Passcode</Text>
+        <Text style={styles.passcodeStatus} testID="dashboard-passcode-status">
+          {passcodeEnabled ? 'Enabled' : 'Not set up'}
+        </Text>
+        {!passcodeEnabled ? (
+          <DefaultButton
+            title="Activate passcode"
+            onPress={() =>
+              navigation.navigate(MainNavigatorScreens.PASSCODE_SETUP)
+            }
+            style={styles.actionButton}
+            testID="dashboard-passcode-setup-button"
+          />
+        ) : null}
       </View>
 
       <DefaultButton
@@ -80,6 +109,18 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     marginTop: 10,
+  },
+  passcodeCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 18,
+    marginBottom: 24,
+  },
+  passcodeStatus: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 12,
   },
   logoutButton: {
     backgroundColor: '#DC2626',

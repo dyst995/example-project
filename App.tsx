@@ -1,6 +1,7 @@
 import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { RootNavigation } from './src/navigation';
+import { PasscodeHydrator } from './src/navigation/PasscodeHydrator';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
 import { store } from './src/store';
@@ -21,7 +22,9 @@ function AppContent() {
     <View style={styles.container}>
       <NavigationContainer>
         <Provider store={store}>
-          <RootNavigation />
+          <PasscodeHydrator>
+            <RootNavigation />
+          </PasscodeHydrator>
         </Provider>
       </NavigationContainer>
     </View>

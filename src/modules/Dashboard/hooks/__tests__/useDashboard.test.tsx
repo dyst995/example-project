@@ -18,21 +18,26 @@ describe('useDashboard', () => {
     dispatchMock = setupStoreHooksMock({
       selectorState: 0,
     }).dispatch;
-    mockedUseAppSelector.mockImplementation(
-      (selector: (state: { dashboard: { activityCount: number } }) => number) =>
-        selector({ dashboard: { activityCount: 0 } }),
+    mockedUseAppSelector.mockImplementation(selector =>
+      selector({
+        dashboard: { activityCount: 0 },
+        passcode: { isEnabled: false },
+      } as never),
     );
   });
 
-  it('exposes activity count from selector', () => {
-    mockedUseAppSelector.mockImplementation(
-      (selector: (state: { dashboard: { activityCount: number } }) => number) =>
-        selector({ dashboard: { activityCount: 4 } }),
+  it('exposes activity count and passcode flag from selectors', () => {
+    mockedUseAppSelector.mockImplementation(selector =>
+      selector({
+        dashboard: { activityCount: 4 },
+        passcode: { isEnabled: true },
+      } as never),
     );
 
     const { result } = renderHook(() => useDashboard());
 
     expect(result.current.activityCount).toBe(4);
+    expect(result.current.passcodeEnabled).toBe(true);
   });
 
   it('dispatches incrementActivity', () => {
