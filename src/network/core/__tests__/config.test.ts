@@ -11,6 +11,7 @@ jest.mock('axios', () => ({
         request: { use: mockRequestUse },
         response: { use: mockResponseUse },
       },
+      request: jest.fn(),
     })),
   },
 }));
@@ -33,16 +34,29 @@ describe('network config interceptors', () => {
     expect(result.headers.Authorization).toBe('Bearer abc-token');
   });
 
-  it('dispatches signOut on 401 response', async () => {
+  it('dispatches signOut on 401 when refresh is unavailable', async () => {
+    const { setupApiClient } = require('../config');
+    setupApiClient({
+      getRefreshToken: () => null,
+      onUnauthorized: mockDispatch,
+    });
+
+    const onRejected = mockResponseUse.mock.calls[0][1];
+    const error = { response: { status: 401 }, config: { url: '/auth', headers: {} } };
+    await expect(onRejected(error)).rejects.toBe(error);
+    expect(mockDispatch).toHaveBeenCalled();
+  });
+
+  it('does not sign out on 403 responses', async () => {
     const { setupApiClient } = require('../config');
     setupApiClient({
       onUnauthorized: mockDispatch,
     });
 
     const onRejected = mockResponseUse.mock.calls[0][1];
-    const error = { response: { status: 401 } };
+    const error = { response: { status: 403 }, config: { url: '/auth', headers: {} } };
     await expect(onRejected(error)).rejects.toBe(error);
-    expect(mockDispatch).toHaveBeenCalled();
+    expect(mockDispatch).not.toHaveBeenCalled();
   });
 
   it('request interceptor passes through request errors', async () => {

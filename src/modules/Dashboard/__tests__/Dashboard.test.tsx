@@ -9,9 +9,13 @@ jest.mock('@react-navigation/native', () => ({
 const authenticatedState = {
   auth: {
     authenticated: true,
-    token: 'token',
+    session: {
+      accessToken: 'token',
+      refreshToken: 'refresh',
+    },
     isLoading: false,
     error: null,
+    isHydrated: true,
   },
   passcode: {
     isEnabled: false,
@@ -68,7 +72,7 @@ describe('Dashboard', () => {
     fireEvent.press(getByTestId('dashboard-logout-button'));
 
     expect(store.getState().auth.authenticated).toBe(false);
-    expect(store.getState().auth.token).toBeNull();
+    expect(store.getState().auth.session).toBeNull();
   });
 
   it('shows passcode setup when passcode is disabled', () => {

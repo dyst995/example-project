@@ -1,6 +1,10 @@
 import { BaseService } from '../../core';
 import { AuthRoutes } from './routes';
-import type { LoginRequestDto, LoginResponseDto } from './types/login.types';
+import type {
+  LoginRequestDto,
+  LoginResponseDto,
+  RefreshTokenRequestDto,
+} from './types/login.types';
 
 class AuthServiceClass extends BaseService {
   constructor() {
@@ -9,6 +13,10 @@ class AuthServiceClass extends BaseService {
 
   public login(data: LoginRequestDto) {
     return this.post<LoginResponseDto>(AuthRoutes.login, data);
+  }
+
+  public refreshToken(data: RefreshTokenRequestDto) {
+    return this.post<LoginResponseDto>(AuthRoutes.refresh, data);
   }
 }
 

@@ -4,24 +4,29 @@ import {
   setupStoreHooksMock,
 } from '../../../../test/storeHooksMock';
 import { useLoginScreen } from '../useLoginScreen';
-import { loginThunk } from '../../../../store/auth/auth.thunk';
 
-jest.mock('../../../../store/auth/auth.thunk', () => ({
-  loginThunk: jest.fn(),
+const mockLogin = jest.fn();
+
+jest.mock('../../../../store/auth', () => ({
+  useLoginMutation: () => [mockLogin, {}],
 }));
 
-const mockedLoginThunk = loginThunk as jest.MockedFunction<typeof loginThunk>;
+const authState = {
+  isLoading: false,
+  error: null as string | null,
+  authenticated: false,
+  session: null,
+  isHydrated: true,
+};
 
 describe('useLoginScreen', () => {
-  let dispatchMock: jest.Mock;
-
   beforeEach(() => {
     jest.clearAllMocks();
-    dispatchMock = setupStoreHooksMock({
-      selectorState: { isLoading: false },
-    }).dispatch;
-    mockedLoginThunk.mockReturnValue({ type: 'auth/login/pending' } as any);
-    dispatchMock.mockResolvedValue(undefined);
+    setupStoreHooksMock();
+    mockedUseAppSelector.mockImplementation(selector =>
+      selector({ auth: authState } as never),
+    );
+    mockLogin.mockResolvedValue(undefined);
   });
 
   it('has initial empty state and disabled submit', () => {
@@ -46,7 +51,12 @@ describe('useLoginScreen', () => {
   });
 
   it('keeps submit disabled when loading', () => {
-    mockedUseAppSelector.mockReturnValue({ isLoading: true } as any);
+    mockedUseAppSelector.mockImplementation(selector =>
+      selector({
+        auth: { ...authState, isLoading: true },
+      } as never),
+    );
+
     const { result } = renderHook(() => useLoginScreen());
 
     act(() => {
@@ -57,18 +67,17 @@ describe('useLoginScreen', () => {
     expect(result.current.isDisabled).toBe(true);
   });
 
-  it('does not dispatch login when form is disabled', async () => {
+  it('does not call login when form is disabled', async () => {
     const { result } = renderHook(() => useLoginScreen());
 
     await act(async () => {
       await result.current.onLogin();
     });
 
-    expect(mockedLoginThunk).not.toHaveBeenCalled();
-    expect(dispatchMock).not.toHaveBeenCalled();
+    expect(mockLogin).not.toHaveBeenCalled();
   });
 
-  it('dispatches login thunk with trimmed username', async () => {
+  it('calls login mutation with trimmed username', async () => {
     const { result } = renderHook(() => useLoginScreen());
 
     act(() => {
@@ -80,10 +89,9 @@ describe('useLoginScreen', () => {
       await result.current.onLogin();
     });
 
-    expect(mockedLoginThunk).toHaveBeenCalledWith({
+    expect(mockLogin).toHaveBeenCalledWith({
       username: 'john',
       password: 'secret',
     });
-    expect(dispatchMock).toHaveBeenCalledWith({ type: 'auth/login/pending' });
   });
 });

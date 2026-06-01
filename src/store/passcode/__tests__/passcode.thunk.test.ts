@@ -1,5 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer from '../../auth/auth.slice';
+
+import { baseApi } from '../../api/baseApi';
+import authReducer, { setSession } from '../../auth/auth.slice';
+import { authenticateWithCredentials } from '../../auth/authSession.service';
 import passcodeReducer from '../passcode.slice';
 import {
   activatePasscodeThunk,
@@ -8,10 +11,9 @@ import {
 } from '../passcode.thunk';
 import { KeychainStorage } from '../../../shared/security/keychain.storage';
 import { passcodePreferences } from '../../../shared/storage/passcodePreferences';
-jest.mock('../../../network/services/auth/auth.service', () => ({
-  AuthService: {
-    login: jest.fn(),
-  },
+
+jest.mock('../../auth/authSession.service', () => ({
+  authenticateWithCredentials: jest.fn(),
 }));
 
 jest.mock('../../../shared/security/keychain.storage', () => ({
@@ -31,29 +33,37 @@ jest.mock('../../../shared/storage/passcodePreferences', () => ({
   },
 }));
 
-import { AuthService } from '../../../network/services/auth/auth.service';
-
+const mockedAuthenticate = authenticateWithCredentials as jest.MockedFunction<
+  typeof authenticateWithCredentials
+>;
 const mockedKeychain = KeychainStorage as jest.Mocked<typeof KeychainStorage>;
 const mockedPreferences = passcodePreferences as jest.Mocked<
   typeof passcodePreferences
 >;
-const mockedAuthService = AuthService as jest.Mocked<typeof AuthService>;
 
 const createStore = () =>
   configureStore({
     reducer: {
       auth: authReducer,
       passcode: passcodeReducer,
+      [baseApi.reducerPath]: baseApi.reducer,
     },
+    middleware: getDefaultMiddleware =>
+      getDefaultMiddleware().concat(baseApi.middleware),
   });
 
 describe('passcode thunks', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockedPreferences.isEnabled.mockReturnValue(false);
-    mockedAuthService.login.mockResolvedValue({
-      data: { accessToken: 'token-123' },
-    } as any);
+    mockedAuthenticate.mockImplementation(async dispatch => {
+      const session = {
+        accessToken: 'token-123',
+        refreshToken: 'refresh-123',
+      };
+      dispatch(setSession(session));
+      return session;
+    });
   });
 
   it('hydrates passcode enabled flag from preferences', async () => {
@@ -106,7 +116,7 @@ describe('passcode thunks', () => {
     expect(store.getState().passcode.error).toBe('Incorrect passcode');
   });
 
-  it('logs in with keychain credentials after valid passcode', async () => {
+  it('authenticates with keychain credentials after valid passcode', async () => {
     mockedKeychain.getPasscode.mockResolvedValue('1234');
     mockedKeychain.getCredentials.mockResolvedValue({
       username: 'user',
@@ -118,11 +128,14 @@ describe('passcode thunks', () => {
     const result = await store.dispatch(passcodeLoginThunk({ passcode: '1234' }));
 
     expect(passcodeLoginThunk.fulfilled.match(result)).toBe(true);
-    expect(mockedAuthService.login).toHaveBeenCalledWith({
-      username: 'user',
-      password: 'secret',
-    });
+    expect(mockedAuthenticate).toHaveBeenCalledWith(
+      expect.any(Function),
+      {
+        username: 'user',
+        password: 'secret',
+      },
+    );
     expect(store.getState().auth.authenticated).toBe(true);
-    expect(store.getState().auth.token).toBe('token-123');
+    expect(store.getState().auth.session?.accessToken).toBe('token-123');
   });
 });

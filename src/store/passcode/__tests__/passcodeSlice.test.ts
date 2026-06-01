@@ -72,7 +72,7 @@ describe('passcodeSlice', () => {
     const pending = passcodeReducer(undefined, passcodeLoginThunk.pending);
     const fulfilled = passcodeReducer(
       pending,
-      passcodeLoginThunk.fulfilled('token', '', { passcode: '1234' }),
+      passcodeLoginThunk.fulfilled(undefined, '', { passcode: '1234' }),
     );
 
     expect(pending.isUnlocking).toBe(true);

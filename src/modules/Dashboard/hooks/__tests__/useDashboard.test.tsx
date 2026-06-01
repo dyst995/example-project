@@ -8,7 +8,6 @@ import {
   incrementActivity,
   resetActivity,
 } from '../../../../store/dashboard/dashboard.slice';
-import { signOut } from '../../../../store/auth/auth.slice';
 
 describe('useDashboard', () => {
   let dispatchMock: jest.Mock;
@@ -60,13 +59,14 @@ describe('useDashboard', () => {
     expect(dispatchMock).toHaveBeenCalledWith(resetActivity());
   });
 
-  it('dispatches signOut on logout', () => {
+  it('dispatches sign out on logout', () => {
     const { result } = renderHook(() => useDashboard());
 
     act(() => {
       result.current.onLogout();
     });
 
-    expect(dispatchMock).toHaveBeenCalledWith(signOut());
+    expect(dispatchMock).toHaveBeenCalledTimes(1);
+    expect(typeof dispatchMock.mock.calls[0][0]).toBe('function');
   });
 });

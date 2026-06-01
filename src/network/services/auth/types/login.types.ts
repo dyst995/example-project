@@ -7,3 +7,7 @@ export interface LoginResponseDto {
   refreshToken: string;
   accessToken: string;
 }
+
+export interface RefreshTokenRequestDto {
+  refreshToken: string;
+}

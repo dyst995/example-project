@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { loginThunk } from '../../../store/auth/auth.thunk';
-import { selectAuthState } from '../../../store/auth/auth.selector';
+
+import { useLoginMutation } from '../../../store/auth';
+import { selectAuthError, selectAuthLoading } from '../../../store/auth/auth.selector';
+import { useAppSelector } from '../../../store/hooks';
 
 export const useLoginScreen = () => {
-  const dispatch = useAppDispatch();
-  const { isLoading } = useAppSelector(selectAuthState);
+  const [login] = useLoginMutation();
+  const isLoading = useAppSelector(selectAuthLoading);
+  const authError = useAppSelector(selectAuthError);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -24,12 +26,10 @@ export const useLoginScreen = () => {
       return;
     }
 
-    await dispatch(
-      loginThunk({
-        username: username.trim(),
-        password,
-      }),
-    );
+    await login({
+      username: username.trim(),
+      password,
+    });
   };
 
   return {
@@ -39,5 +39,6 @@ export const useLoginScreen = () => {
     onUsernameChange,
     onPasswordChange,
     onLogin,
+    error: authError,
   };
 };

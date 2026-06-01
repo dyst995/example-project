@@ -1,4 +1,7 @@
+import { createSelector } from '@reduxjs/toolkit';
+
 import { RootState } from '..';
+import { selectIsAuthenticated } from '../auth/auth.selector';
 
 export const selectPasscodeState = (state: RootState) => state.passcode;
 
@@ -8,7 +11,12 @@ export const selectPasscodeEnabled = (state: RootState) =>
 export const selectPasscodeHydrated = (state: RootState) =>
   state.passcode.isHydrated;
 
-export const selectShowPasscodeLogin = (state: RootState) =>
-  state.passcode.isHydrated &&
-  state.passcode.isEnabled &&
-  !state.auth.authenticated;
+export const selectShowPasscodeLogin = createSelector(
+  [
+    (state: RootState) => state.passcode.isHydrated,
+    (state: RootState) => state.passcode.isEnabled,
+    selectIsAuthenticated,
+  ],
+  (isHydrated, isEnabled, isAuthenticated) =>
+    isHydrated && isEnabled && !isAuthenticated,
+);

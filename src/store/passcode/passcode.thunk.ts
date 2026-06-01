@@ -3,7 +3,10 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { PASSCODE_PIN_LENGTH } from '../../shared/constants/passcode';
 import { KeychainStorage } from '../../shared/security/keychain.storage';
 import { passcodePreferences } from '../../shared/storage/passcodePreferences';
-import { loginThunk } from '../auth/auth.thunk';
+import {
+  authenticateWithCredentials,
+  type AuthenticateError,
+} from '../auth/authSession.service';
 
 type PasscodeThunkError = {
   message: string;
@@ -55,7 +58,7 @@ type PasscodeLoginPayload = {
 };
 
 export const passcodeLoginThunk = createAsyncThunk<
-  string,
+  void,
   PasscodeLoginPayload,
   { rejectValue: PasscodeThunkError }
 >(
@@ -79,19 +82,18 @@ export const passcodeLoginThunk = createAsyncThunk<
       });
     }
 
-    const result = await dispatch(
-      loginThunk({
-        username: credentials.username,
-        password: credentials.password,
-      }),
-    );
+    try {
+      await authenticateWithCredentials(dispatch, credentials);
+    } catch (error: unknown) {
+      const message =
+        typeof error === 'object' &&
+        error !== null &&
+        'message' in error &&
+        typeof (error as AuthenticateError).message === 'string'
+          ? (error as AuthenticateError).message
+          : 'Login failed';
 
-    if (loginThunk.fulfilled.match(result)) {
-      return result.payload;
+      return rejectWithValue({ message });
     }
-
-    return rejectWithValue({
-      message: result.payload?.message ?? 'Login failed',
-    });
   },
 );

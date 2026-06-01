@@ -1,5 +1,6 @@
 import { apiClient } from '../core';
-import type { ApiResult, HttpMethod } from './types';
+import { normalizeApiError } from '../utils/normalizeApiError';
+import type { ApiError, ApiResult, HttpMethod } from './types';
 
 export type RequestData = object | FormData;
 export type RequestParams = Record<string, string | number | boolean>;
@@ -29,17 +30,8 @@ export class BaseService {
         headers,
       };
     } catch (error: unknown) {
-      const axiosError = error as {
-        response?: {
-          data?: { message?: string; errors?: Record<string, string[]> };
-          status?: number;
-        };
-      };
-      throw {
-        message: axiosError.response?.data?.message || 'An error occurred',
-        status: axiosError.response?.status || 500,
-        errors: axiosError.response?.data?.errors,
-      };
+      const apiError: ApiError = normalizeApiError(error);
+      throw apiError;
     }
   }
 

@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { signOut } from '../../../store/auth/auth.slice';
+import { signOutThunk } from '../../../store/auth';
 import {
   incrementActivity,
   resetActivity,
@@ -21,7 +21,7 @@ export const useDashboard = () => {
   };
 
   const onLogout = () => {
-    dispatch(signOut());
+    dispatch(signOutThunk());
   };
 
   return {
