@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import { baseApi } from '../../api/baseApi';
+import type { AppDispatch } from '../../storeTypes';
 import authReducer, { setSession } from '../../auth/auth.slice';
 import { authenticateWithCredentials } from '../../auth/authSession.service';
 import passcodeReducer from '../passcode.slice';
@@ -52,6 +53,9 @@ const createStore = () =>
       getDefaultMiddleware().concat(baseApi.middleware),
   });
 
+const appDispatch = (store: ReturnType<typeof createStore>): AppDispatch =>
+  store.dispatch as AppDispatch;
+
 describe('passcode thunks', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -70,7 +74,7 @@ describe('passcode thunks', () => {
     mockedPreferences.isEnabled.mockReturnValue(true);
     const store = createStore();
 
-    await store.dispatch(hydratePasscodeThunk());
+    await appDispatch(store)(hydratePasscodeThunk());
 
     expect(store.getState().passcode.isEnabled).toBe(true);
     expect(store.getState().passcode.isHydrated).toBe(true);
@@ -79,7 +83,7 @@ describe('passcode thunks', () => {
   it('rejects activation when passcodes do not match', async () => {
     const store = createStore();
 
-    const result = await store.dispatch(
+    const result = await appDispatch(store)(
       activatePasscodeThunk({ passcode: '1234', confirmPasscode: '9999' }),
     );
 
@@ -94,7 +98,7 @@ describe('passcode thunks', () => {
     });
     const store = createStore();
 
-    const result = await store.dispatch(
+    const result = await appDispatch(store)(
       activatePasscodeThunk({ passcode: '1234', confirmPasscode: '1234' }),
     );
 
@@ -108,9 +112,7 @@ describe('passcode thunks', () => {
     mockedKeychain.getPasscode.mockResolvedValue('1234');
     const store = createStore();
 
-    const result = await store.dispatch(
-      passcodeLoginThunk({ passcode: '0000' }),
-    );
+    const result = await appDispatch(store)(passcodeLoginThunk({ passcode: '0000' }));
 
     expect(passcodeLoginThunk.rejected.match(result)).toBe(true);
     expect(store.getState().passcode.error).toBe('Incorrect passcode');
@@ -125,7 +127,7 @@ describe('passcode thunks', () => {
 
     const store = createStore();
 
-    const result = await store.dispatch(passcodeLoginThunk({ passcode: '1234' }));
+    const result = await appDispatch(store)(passcodeLoginThunk({ passcode: '1234' }));
 
     expect(passcodeLoginThunk.fulfilled.match(result)).toBe(true);
     expect(mockedAuthenticate).toHaveBeenCalledWith(

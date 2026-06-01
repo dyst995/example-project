@@ -20,7 +20,7 @@ describe('passcodeSlice', () => {
 
   it('hydrates enabled flag', () => {
     const state = passcodeReducer(
-      passcodeReducer(undefined, hydratePasscodeThunk.pending),
+      passcodeReducer(undefined, hydratePasscodeThunk.pending('request-id', undefined)),
       hydratePasscodeThunk.fulfilled(true, '', undefined),
     );
 
@@ -30,7 +30,10 @@ describe('passcodeSlice', () => {
 
   it('marks passcode enabled after activation', () => {
     const state = passcodeReducer(
-      passcodeReducer(undefined, activatePasscodeThunk.pending),
+      passcodeReducer(undefined, activatePasscodeThunk.pending('request-id', {
+        passcode: '1234',
+        confirmPasscode: '1234',
+      })),
       activatePasscodeThunk.fulfilled(undefined, '', {
         passcode: '1234',
         confirmPasscode: '1234',
@@ -43,10 +46,16 @@ describe('passcodeSlice', () => {
 
   it('stores activation errors', () => {
     const state = passcodeReducer(
-      passcodeReducer(undefined, activatePasscodeThunk.pending),
-      activatePasscodeThunk.rejected(null, '', undefined, {
-        message: 'Passcodes do not match',
-      }),
+      passcodeReducer(undefined, activatePasscodeThunk.pending('request-id', {
+        passcode: '1234',
+        confirmPasscode: '1234',
+      })),
+      activatePasscodeThunk.rejected(
+        new Error('Passcodes do not match'),
+        'request-id',
+        { passcode: '1234', confirmPasscode: '9999' },
+        { message: 'Passcodes do not match' },
+      ),
     );
 
     expect(state.error).toBe('Passcodes do not match');
@@ -69,7 +78,10 @@ describe('passcodeSlice', () => {
   });
 
   it('tracks unlock loading state', () => {
-    const pending = passcodeReducer(undefined, passcodeLoginThunk.pending);
+    const pending = passcodeReducer(
+      undefined,
+      passcodeLoginThunk.pending('request-id', { passcode: '1234' }),
+    );
     const fulfilled = passcodeReducer(
       pending,
       passcodeLoginThunk.fulfilled(undefined, '', { passcode: '1234' }),

@@ -23,8 +23,8 @@ describe('KeychainStorage', () => {
       username: 'user',
       password: 'secret',
       service: 'detoxtestproject.credentials',
-      storage: 'keychain',
-    });
+      storage: 'KeystoreAESGCM_NoAuth',
+    } as Keychain.UserCredentials);
 
     await expect(KeychainStorage.getCredentials()).resolves.toEqual({
       username: 'user',
@@ -43,8 +43,8 @@ describe('KeychainStorage', () => {
       username: 'passcode',
       password: '1234',
       service: 'detoxtestproject.passcode',
-      storage: 'keychain',
-    });
+      storage: 'KeystoreAESGCM_NoAuth',
+    } as Keychain.UserCredentials);
 
     await KeychainStorage.savePasscode('1234');
 

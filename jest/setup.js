@@ -17,6 +17,9 @@ try {
 
 jest.mock('react-native-keychain', () => ({
   ACCESSIBLE: { WHEN_UNLOCKED: 'WHEN_UNLOCKED' },
+  STORAGE_TYPE: {
+    AES_GCM_NO_AUTH: 'KeystoreAESGCM_NoAuth',
+  },
   setGenericPassword: jest.fn(() => Promise.resolve(true)),
   getGenericPassword: jest.fn(() => Promise.resolve(false)),
   resetGenericPassword: jest.fn(() => Promise.resolve(true)),

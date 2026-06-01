@@ -7,6 +7,7 @@ import {
   authenticateWithCredentials,
   type AuthenticateError,
 } from '../auth/authSession.service';
+import type { AppDispatch } from '../storeTypes';
 
 type PasscodeThunkError = {
   message: string;
@@ -60,7 +61,7 @@ type PasscodeLoginPayload = {
 export const passcodeLoginThunk = createAsyncThunk<
   void,
   PasscodeLoginPayload,
-  { rejectValue: PasscodeThunkError }
+  { rejectValue: PasscodeThunkError; dispatch: AppDispatch }
 >(
   'passcode/login',
   async ({ passcode }, { dispatch, rejectWithValue }) => {

@@ -4,7 +4,7 @@ import { setupApiClient } from '../network/core';
 import { baseApi } from './api/baseApi';
 import { authApi } from './auth/auth.api';
 import authReducer from './auth/auth.slice';
-import { hydrateSessionThunk, signOutThunk } from './auth/auth.thunk';
+import { signOutThunk } from './auth/auth.thunk';
 import dashboardReducer from './dashboard/dashboard.slice';
 import passcodeReducer from './passcode/passcode.slice';
 

@@ -61,7 +61,7 @@ describe('authSlice', () => {
 
   it('hydrates persisted session', () => {
     const state = authReducer(
-      authReducer(undefined, hydrateSessionThunk.pending),
+      authReducer(undefined, hydrateSessionThunk.pending('request-id', undefined)),
       hydrateSessionThunk.fulfilled(session, '', undefined),
     );
 

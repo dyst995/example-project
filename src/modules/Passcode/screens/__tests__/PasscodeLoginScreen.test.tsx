@@ -1,4 +1,4 @@
-import { fireEvent, render } from '@testing-library/react-native';
+import { render } from '@testing-library/react-native';
 import { PasscodeLoginScreen } from '../PasscodeLoginScreen';
 import { usePasscodeLoginScreen } from '../../hooks';
 
