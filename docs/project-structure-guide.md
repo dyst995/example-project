@@ -370,6 +370,16 @@ Login flow:
 5. Add module UI that uses generated hooks or dispatches thunks only.
 6. Export `store/<feature>/index.ts`.
 
+## Skills and automation
+
+For repeatable workflows when using this repo as a template, see [skills-and-automation.md](./skills-and-automation.md).
+
+- `npm run scaffold:api-feature -- FeatureName`
+- `npm run scaffold:module -- FeatureName`
+- `npm run validate:architecture`
+
+Cursor skills live in `.cursor/skills/`; agent entry point is `AGENTS.md`.
+
 ## When To Add More Abstraction
 
 Add repository/use-case layers only when needed:

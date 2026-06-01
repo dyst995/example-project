@@ -1,0 +1,21 @@
+---
+description: Layered RN architecture — network, domain, RTK Query store, modules
+globs: src/**/*
+alwaysApply: false
+---
+
+# Architecture (quick rules)
+
+Full guide: `docs/project-structure-guide.md`
+
+- **modules/** — UI only. Use store hooks / domain types. Never import `network/**` or DTOs.
+- **network/** — routes, DTOs, services, mappers. No Redux or React.
+- **domain/** — app models (`AuthSession`, etc.). No network/store imports.
+- **store/** — RTK Query `*.api.ts` calls services via `queryFn`; slices hold client state; thunks for hydration/local flows.
+- **Mapping** — DTO → domain in `network/.../mappers` before slice/UI.
+
+Scaffold: `npm run scaffold:api-feature -- Feature` then `npm run scaffold:module -- Feature`.
+
+Audit: use skill `structure-review` or `npm run validate:architecture`.
+
+Golden examples: `auth` (HTTP + session), `passcode` (local thunks), `dashboard` (UI state).
