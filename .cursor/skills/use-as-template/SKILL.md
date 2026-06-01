@@ -5,7 +5,24 @@ description: Bootstraps a new React Native project from this repository's layere
 
 # Use This Repo as a Template
 
-## What to copy
+## New React Native CLI app (recommended)
+
+From an empty folder **after** `npx @react-native-community/cli init MyApp`:
+
+```bash
+cd MyApp
+TEMPLATE=/absolute/path/to/example-project node "$TEMPLATE/scripts/bootstrap-into-app.mjs"
+```
+
+Or from this repo after copying `scripts/` into the new app:
+
+```bash
+TEMPLATE=/path/to/example-project npm run bootstrap:app
+```
+
+Full steps: `docs/bootstrap-new-app.md`.
+
+## What to copy (manual alternative)
 
 | Area | Copy |
 |------|------|

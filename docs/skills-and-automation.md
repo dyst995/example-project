@@ -6,6 +6,7 @@ Use this repo as a **reference template** for other React Native projects. Autom
 
 | npm script | Script | What it does |
 |------------|--------|----------------|
+| `bootstrap:app` | `scripts/bootstrap-into-app.mjs` | Copy template into current RN CLI project (run from **new** app root; set `TEMPLATE` env) |
 | `scaffold:api-feature` | `scripts/scaffold-api-feature.mjs` | Creates domain model, network service, RTK Query slice, patches `store/index.ts` |
 | `scaffold:module` | `scripts/scaffold-module.mjs` | Creates `modules/<Feature>/` (screen + hook + barrels) |
 | `validate:architecture` | `scripts/validate-architecture.mjs` | Checks module→network imports, store barrels, domain exports |

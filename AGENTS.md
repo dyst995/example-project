@@ -4,6 +4,7 @@ This React Native app uses a **layered architecture**. Read this before large ch
 
 ## Primary docs
 
+- [Bootstrap new CLI app](docs/bootstrap-new-app.md) — copy this template into a fresh `react-native init`
 - [Project structure guide](docs/project-structure-guide.md) — layers, naming, RTK Query rules
 - [Skills & automation](docs/skills-and-automation.md) — scripts, Cursor skills, CI checks
 
