@@ -54,8 +54,10 @@ Validate navigation internal structure:
 Validate store internal structure:
 
 - feature-first folders under `store/<feature>/`
-- expected feature files: `*.slice.ts`, `*.thunk.ts`
-- optional but preferred: selector file (`*.selector.ts` or `*.selectors.ts`), feature `index.ts`
+- shared RTK Query entry: `store/api/baseApi.ts`
+- expected feature files: `*.slice.ts`; HTTP via `*.api.ts` (RTK Query → network services)
+- thunks/services for non-HTTP flows (`hydrate`, secure storage, orchestration)
+- optional but preferred: selector file (`*.selector.ts`), feature `index.ts`
 
 ## Checklist
 
@@ -69,7 +71,8 @@ Validate store internal structure:
 - [ ] Feature module public exports (`modules/<Feature>/index.ts`) expose screens only.
 - [ ] UI/modules do not import DTOs directly.
 - [ ] Domain models are not mixed with transport DTOs.
-- [ ] Routes/endpoints are not defined in UI/store files.
+- [ ] Routes/endpoints are not defined in UI/modules (only in `network/services/<feature>/routes.ts`).
+- [ ] HTTP calls in store use `*.api.ts` with `queryFn` delegating to feature services (not raw axios in modules).
 - [ ] Network responses are mapped before app-wide use when shapes differ.
 - [ ] Feature services are consumed as exported singleton instances when the feature follows singleton service pattern.
 - [ ] Navigation has required folders (`navigators`, `types`, `enums`).
@@ -80,7 +83,9 @@ Validate store internal structure:
 - [ ] `MainNavigator.tsx` registers app screens with main param list type.
 - [ ] Navigation files do not contain endpoint, DTO, or service logic.
 - [ ] Store is organized by feature folders (for example `store/auth/`).
-- [ ] Async store flows are implemented in `*.thunk.ts`; sync transitions are in `*.slice.ts`.
+- [ ] Server HTTP is in RTK Query `*.api.ts`; non-HTTP async is in `*.thunk.ts` or `*Session.service.ts`; sync transitions are in `*.slice.ts`.
+- [ ] Each `store/<feature>/` has an `index.ts` barrel when the feature is non-trivial.
+- [ ] Domain models are exported from `domain/models/index.ts`.
 - [ ] Feature selectors live with feature store files and follow one naming convention (`*.selector.ts` or `*.selectors.ts`).
 - [ ] Redux typed hooks stay in `store/hooks.ts`.
 - [ ] Global reusable hooks are in `shared/hooks`; feature hooks stay in feature modules.

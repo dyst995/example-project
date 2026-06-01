@@ -11,6 +11,7 @@ export const LoginScreen: React.FC<Props> = () => {
     isDisabled,
     username,
     password,
+    error,
     onUsernameChange,
     onPasswordChange,
     onLogin,
@@ -43,6 +44,12 @@ export const LoginScreen: React.FC<Props> = () => {
           containerStyle={styles.passwordInput}
           testID="login-password-input"
         />
+
+        {error ? (
+          <Text style={styles.error} testID="login-error">
+            {error}
+          </Text>
+        ) : null}
 
         <DefaultButton
           title="Log in"
@@ -80,6 +87,11 @@ const styles = StyleSheet.create({
   },
   passwordInput: {
     marginTop: 12,
+  },
+  error: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#B91C1C',
   },
   loginButton: {
     marginTop: 20,

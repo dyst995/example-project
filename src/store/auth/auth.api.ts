@@ -1,26 +1,27 @@
 import type { AuthSession } from '../../domain/models/session';
-import type { ApiError } from '../../network/core/types';
-import { AuthRoutes } from '../../network/services/auth/routes';
-import { toAuthSession } from '../../network/services/auth/mappers/auth.mapper';
-import type {
-  LoginRequestDto,
-  LoginResponseDto,
-  RefreshTokenRequestDto,
-} from '../../network/services/auth/types/login.types';
+import type { LoginCredentials } from '../../domain/models/loginCredentials';
+import { AuthService } from '../../network/services/auth/auth.service';
+import {
+  toAuthSession,
+  toLoginRequestDto,
+} from '../../network/services/auth/mappers/auth.mapper';
+import type { RefreshTokenRequestDto } from '../../network/services/auth/types/login.types';
+import { normalizeApiError } from '../../network/utils/normalizeApiError';
 import { KeychainStorage } from '../../shared/security/keychain.storage';
 import { SessionStorage } from '../../shared/security/session.storage';
 import { baseApi } from '../api/baseApi';
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: build => ({
-    login: build.mutation<AuthSession, LoginRequestDto>({
-      query: credentials => ({
-        url: AuthRoutes.login,
-        method: 'POST',
-        data: credentials,
-      }),
-      transformResponse: (response: LoginResponseDto) => toAuthSession(response),
-      transformErrorResponse: (error: ApiError) => error,
+    login: build.mutation<AuthSession, LoginCredentials>({
+      async queryFn(credentials) {
+        try {
+          const response = await AuthService.login(toLoginRequestDto(credentials));
+          return { data: toAuthSession(response.data) };
+        } catch (error) {
+          return { error: normalizeApiError(error) };
+        }
+      },
       async onQueryStarted(credentials, { queryFulfilled }) {
         try {
           const { data: session } = await queryFulfilled;
@@ -36,13 +37,14 @@ export const authApi = baseApi.injectEndpoints({
       invalidatesTags: ['Auth'],
     }),
     refreshSession: build.mutation<AuthSession, RefreshTokenRequestDto>({
-      query: body => ({
-        url: AuthRoutes.refresh,
-        method: 'POST',
-        data: body,
-      }),
-      transformResponse: (response: LoginResponseDto) => toAuthSession(response),
-      transformErrorResponse: (error: ApiError) => error,
+      async queryFn(body) {
+        try {
+          const response = await AuthService.refreshToken(body);
+          return { data: toAuthSession(response.data) };
+        } catch (error) {
+          return { error: normalizeApiError(error) };
+        }
+      },
       async onQueryStarted(_arg, { queryFulfilled }) {
         try {
           const { data: session } = await queryFulfilled;

@@ -3,9 +3,9 @@ import { signOutThunk } from '../../../store/auth';
 import {
   incrementActivity,
   resetActivity,
-} from '../../../store/dashboard/dashboard.slice';
-import { selectActivityCount } from '../../../store/dashboard/dashboard.selector';
-import { selectPasscodeEnabled } from '../../../store/passcode/passcode.selector';
+  selectActivityCount,
+} from '../../../store/dashboard';
+import { selectPasscodeEnabled } from '../../../store/passcode';
 
 export const useDashboard = () => {
   const dispatch = useAppDispatch();

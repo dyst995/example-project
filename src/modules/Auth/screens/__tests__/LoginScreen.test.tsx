@@ -60,6 +60,22 @@ describe('LoginScreen', () => {
     expect(onLogin).toHaveBeenCalledTimes(1);
   });
 
+  it('shows login error from hook', () => {
+    mockedUseLoginScreen.mockReturnValue({
+      isDisabled: false,
+      username: 'niko',
+      password: 'secret',
+      error: 'Invalid credentials',
+      onUsernameChange,
+      onPasswordChange,
+      onLogin,
+    });
+
+    const { getByTestId } = render(<LoginScreen />);
+
+    expect(getByTestId('login-error')).toHaveTextContent('Invalid credentials');
+  });
+
   it('does not trigger login when hook marks form disabled', () => {
     mockedUseLoginScreen.mockReturnValue({
       isDisabled: true,

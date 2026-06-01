@@ -1,5 +1,5 @@
+import type { LoginCredentials } from '../../domain/models/loginCredentials';
 import type { AuthSession } from '../../domain/models/session';
-import type { LoginRequestDto } from '../../network/services/auth/types/login.types';
 import type { StoredCredentials } from '../../shared/security/keychain.storage';
 import { isApiError } from '../../network/utils/normalizeApiError';
 import type { AppDispatch } from '../storeTypes';
@@ -11,10 +11,15 @@ export type AuthenticateError = {
 
 export const authenticateWithCredentials = async (
   dispatch: AppDispatch,
-  credentials: StoredCredentials | LoginRequestDto,
+  credentials: StoredCredentials | LoginCredentials,
 ): Promise<AuthSession> => {
   try {
-    return await dispatch(authApi.endpoints.login.initiate(credentials)).unwrap();
+    return await dispatch(
+      authApi.endpoints.login.initiate({
+        username: credentials.username,
+        password: credentials.password,
+      }),
+    ).unwrap();
   } catch (error: unknown) {
     throw {
       message: isApiError(error) ? error.message : 'Login failed',

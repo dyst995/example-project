@@ -37,10 +37,14 @@ src/
   store/
     index.ts
     hooks.ts
+    api/
+      baseApi.ts
     auth/
+      auth.api.ts
       auth.slice.ts
       auth.thunk.ts
       auth.selector.ts
+      authSession.service.ts
       index.ts
   shared/
 docs/
@@ -85,8 +89,10 @@ Contains global application state and async state orchestration.
   - configure Redux store and register feature reducers
 - `hooks.ts`
   - typed hooks (`useAppDispatch`, `useAppSelector`)
+- `api/`
+  - shared RTK Query `baseApi` and `axiosBaseQuery`
 - `<feature>/`
-  - feature-scoped Redux files (`*.slice.ts`, `*.thunk.ts`, selectors, exports)
+  - feature-scoped Redux files (`*.slice.ts`, `*.api.ts`, `*.thunk.ts`, selectors, `index.ts`)
 
 ### `shared`
 
@@ -214,9 +220,11 @@ Navigator responsibilities:
 - `AuthNavigator.tsx` must register auth-related screens and use auth param list type.
 - `MainNavigator.tsx` must register authorized/app screens and use main param list type.
 
-## State Management (Redux Slice + Thunk)
+## State Management (Redux Toolkit + RTK Query)
 
-Use Redux Toolkit slices for state and `createAsyncThunk` for async feature flows.
+Use Redux Toolkit slices for **client/session state** and **RTK Query** for **server state** (HTTP reads/writes).
+
+Use `createAsyncThunk` only for flows that are not plain HTTP requests (for example hydration from local storage, passcode activation, orchestration across services).
 
 ### Recommended Store Feature Structure
 
@@ -224,10 +232,19 @@ Use Redux Toolkit slices for state and `createAsyncThunk` for async feature flow
 src/store/
   index.ts
   hooks.ts
+  api/
+    baseApi.ts
   auth/
-    auth.slice.ts
-    auth.thunk.ts
+    auth.api.ts          # RTK Query endpoints (calls network services)
+    auth.slice.ts        # sync state + matchers for API lifecycle
+    auth.thunk.ts        # hydrate/signOut and other non-HTTP flows
     auth.selector.ts
+    authSession.service.ts
+    index.ts
+  passcode/
+    passcode.slice.ts
+    passcode.thunk.ts
+    passcode.selector.ts
     index.ts
 ```
 
@@ -235,10 +252,14 @@ src/store/
 
 - Keep store code feature-first (`store/<feature>/...`), not globally mixed.
 - Keep synchronous state transitions in `*.slice.ts`.
-- Keep async API orchestration in `*.thunk.ts`.
-- Keep feature selectors in feature folder (`*.selector.ts` or `*.selectors.ts`, one convention only).
-- Thunks may call `network/services/*`; modules should dispatch thunks instead of calling services directly.
-- Keep slice state minimal and UI-friendly (`isLoading`, `error`, session/token flags).
+- Keep **HTTP API calls** in `*.api.ts` via `baseApi.injectEndpoints`, implemented with `queryFn` that delegates to `network/services/*` (do not duplicate axios calls in the store).
+- Sync API results into slices with `extraReducers` + `authApi.endpoints.*.matchPending/Fulfilled/Rejected` (or equivalent), or `onQueryStarted` for side effects (secure storage).
+- Keep **non-HTTP orchestration** in `*.thunk.ts` or small `*Session.service.ts` helpers under the feature folder.
+- Keep feature selectors in `*.selector.ts` (one convention per repo).
+- Modules use RTK Query hooks (`useLoginMutation`) or dispatch thunks/helpers; they must not import `network/services` or DTOs.
+- Keep slice state minimal and UI-friendly (`isLoading`, `error`, domain models such as `AuthSession`).
+- Export each feature from `store/<feature>/index.ts`.
+- Do not put side effects (MMKV, Keychain) inside reducers; use `onQueryStarted`, thunks, or dedicated services.
 
 ## Naming Conventions
 
@@ -262,7 +283,7 @@ Do not use `Dto` suffix:
 Use feature-wide route object, not endpoint-specific object:
 
 - `AuthRoutes` (or `AUTH_ROUTES`)
-- keys: `login`, `register`, `refreshToken`
+- keys: `login`, `refresh`, `register`
 
 ### Enums
 
@@ -291,54 +312,63 @@ Benefits:
 
 ```txt
 src/
-  domain/
-    models/
-      user.ts
-      session.ts
-  network/
-    services/
-      auth/
-        routes.ts
-        auth.service.ts
-        types/
-          login.types.ts
-        mappers/
-          auth.mapper.ts
-  modules/
-    Auth/
-      LoginScreen.tsx
-      useLoginScreen.ts
+  domain/models/
+    session.ts
+    loginCredentials.ts
+  network/services/auth/
+    routes.ts
+    auth.service.ts
+    types/login.types.ts
+    mappers/auth.mapper.ts
+  modules/Auth/
+    screens/LoginScreen.tsx
+    hooks/useLoginScreen.tsx
   store/
+    api/baseApi.ts
     auth/
+      auth.api.ts
       auth.slice.ts
       auth.thunk.ts
+      authSession.service.ts
+      index.ts
 ```
+
+Login flow:
+
+1. `useLoginScreen` calls `useLoginMutation`.
+2. `auth.api` `queryFn` calls `AuthService.login` and maps DTO → `AuthSession`.
+3. `auth.slice` matchers update session flags; `onQueryStarted` persists session/credentials.
+4. `AuthHydrator` runs `hydrateSessionThunk` on app start.
 
 ## Practical Rules
 
 ### Do
 
 - keep DTOs in `network/services/<feature>/types`
-- keep domain models in `domain/models`
-- keep mappers near feature service
-- keep UI imports pointing to `domain`, not `network`
-- keep async API orchestration in feature thunks and keep sync transitions in slices
+- keep domain models in `domain/models` (export from `domain/models/index.ts`)
+- keep mappers in `network/services/<feature>/mappers`
+- keep UI imports pointing to `domain` and `store`, not `network`
+- keep HTTP in RTK Query `*.api.ts` delegating to services
+- keep sync transitions and domain state in slices
+- use `signOutThunk` (or equivalent) when logout must clear secure storage
 
 ### Do Not
 
-- do not import DTOs directly in screens/hooks
-- do not put endpoint strings in UI/store
+- do not import DTOs or `network/**` from `modules/**` (enforced by ESLint)
+- do not put endpoint strings in UI
 - do not mix network contract types with domain types in one file
-- do not duplicate API cache in Redux slices without a strong reason
+- do not call `AuthService` directly from modules
+- do not duplicate API cache in Redux slices when RTK Query already owns server data
+- do not perform storage side effects inside reducers
 
-## Migration Plan (Incremental)
+## Adding a New API-Backed Feature
 
-1. Keep current network core as-is.
-2. Move app-facing models to `domain/models`.
-3. Keep request/response DTOs in `network/services/<feature>/types`.
-4. Add mapper functions for transformed responses.
-5. Update UI imports to domain models.
-6. Expand per feature without refactoring everything at once.
+1. Add domain model(s) under `domain/models/`.
+2. Add `network/services/<feature>/` (routes, types, mapper, service).
+3. Add `store/<feature>/<feature>.api.ts` via `baseApi.injectEndpoints` with `queryFn` → service.
+4. Add `store/<feature>/<feature>.slice.ts` with matchers for API lifecycle.
+5. Add module UI that uses generated hooks or dispatches thunks only.
+6. Export `store/<feature>/index.ts`.
 
 ## When To Add More Abstraction
 
